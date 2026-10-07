@@ -1,13 +1,14 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Sumit Guha | Department of Music</title>
+    <title>Takshashila Vidhyapeeth | Department of Music</title>
 
     <meta name="description"
-          content="Official academic profile of Sumit Guha, Department of Music. Explore academic work, research, achievements and contact information.">
+        content="Takshashila Vidhyapeeth - Department of Music. Explore faculty, academic activities, research, achievements and cultural contributions.">
 
     <style>
         * {
@@ -19,29 +20,31 @@
 
         body {
             font-family: Arial, Helvetica, sans-serif;
-            background: #f7f7f7;
-            color: #222;
-            line-height: 1.6;
+            background: #f8f5ef;
+            color: #1c1c1c;
+            line-height: 1.7;
         }
 
-        /* NAVIGATION */
+        /* ================= NAVIGATION ================= */
+
         nav {
             position: fixed;
             top: 0;
+            left: 0;
             width: 100%;
-            padding: 18px 8%;
-            background: rgba(255,255,255,0.96);
+            padding: 18px 7%;
+            background: rgba(255, 255, 255, 0.97);
             display: flex;
             justify-content: space-between;
             align-items: center;
             z-index: 1000;
-            box-shadow: 0 2px 15px rgba(0,0,0,0.08);
+            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.08);
         }
 
         .logo {
-            font-size: 22px;
-            font-weight: bold;
-            color: #111;
+            font-size: 21px;
+            font-weight: 800;
+            letter-spacing: 0.5px;
         }
 
         .logo span {
@@ -51,7 +54,7 @@
         nav ul {
             list-style: none;
             display: flex;
-            gap: 28px;
+            gap: 27px;
         }
 
         nav a {
@@ -59,39 +62,45 @@
             color: #333;
             font-size: 14px;
             font-weight: 600;
+            transition: 0.3s;
         }
 
         nav a:hover {
             color: #9b6b2f;
         }
 
-        /* HERO */
+        /* ================= HERO ================= */
+
         .hero {
             min-height: 100vh;
-            padding: 150px 8% 80px;
+            padding: 150px 8% 90px;
             display: flex;
             align-items: center;
             justify-content: space-between;
             gap: 60px;
-            background: linear-gradient(135deg, #ffffff, #f1eee9);
+
+            background:
+                linear-gradient(135deg,
+                #ffffff 0%,
+                #f3eee6 100%);
         }
 
         .hero-text {
-            max-width: 650px;
+            max-width: 720px;
         }
 
-        .small-title {
+        .tag {
             color: #9b6b2f;
             font-weight: bold;
-            letter-spacing: 2px;
-            font-size: 14px;
-            margin-bottom: 15px;
+            letter-spacing: 3px;
+            font-size: 13px;
+            margin-bottom: 18px;
         }
 
         .hero h1 {
-            font-size: clamp(45px, 7vw, 78px);
+            font-size: clamp(42px, 7vw, 78px);
             line-height: 1.05;
-            margin-bottom: 20px;
+            margin-bottom: 18px;
             color: #111;
         }
 
@@ -99,47 +108,56 @@
             color: #9b6b2f;
         }
 
+        .hero h2 {
+            font-size: 25px;
+            font-weight: 500;
+            margin-bottom: 18px;
+        }
+
         .hero p {
-            font-size: 18px;
-            color: #555;
-            max-width: 570px;
+            color: #666;
+            font-size: 17px;
+            max-width: 620px;
             margin-bottom: 30px;
         }
 
         .button {
             display: inline-block;
-            padding: 13px 25px;
-            background: #111;
+            padding: 13px 26px;
+            background: #151515;
             color: white;
             text-decoration: none;
             border-radius: 4px;
             font-weight: bold;
             margin-right: 10px;
+            transition: 0.3s;
         }
 
         .button:hover {
             background: #9b6b2f;
+            transform: translateY(-2px);
         }
 
-        .button-outline {
+        .outline {
             background: transparent;
-            color: #111;
-            border: 1px solid #111;
+            color: #151515;
+            border: 1px solid #151515;
         }
 
-        .button-outline:hover {
+        .outline:hover {
             color: white;
         }
 
-        /* PROFILE PHOTO */
+        /* ================= PROFILE PHOTO ================= */
+
         .profile {
             width: 350px;
-            height: 430px;
+            height: 440px;
             background: #ddd;
             border-radius: 8px;
             overflow: hidden;
-            box-shadow: 0 25px 60px rgba(0,0,0,0.18);
             flex-shrink: 0;
+            box-shadow: 0 25px 65px rgba(0, 0, 0, 0.18);
         }
 
         .profile img {
@@ -148,7 +166,8 @@
             object-fit: cover;
         }
 
-        /* SECTIONS */
+        /* ================= GENERAL SECTIONS ================= */
+
         section {
             padding: 100px 8%;
         }
@@ -159,47 +178,53 @@
         }
 
         .section-title h2 {
-            font-size: 38px;
-            margin-bottom: 10px;
+            font-size: 40px;
+            margin-bottom: 8px;
         }
 
         .section-title p {
             color: #777;
         }
 
-        /* ABOUT */
+        /* ================= ABOUT ================= */
+
         .about {
-            background: white;
+            background: #ffffff;
         }
 
         .about-content {
-            max-width: 950px;
+            max-width: 900px;
             margin: auto;
             text-align: center;
-            font-size: 17px;
             color: #555;
+            font-size: 17px;
         }
 
-        /* CARDS */
+        /* ================= DEPARTMENT ================= */
+
+        .department {
+            background: #eee7dc;
+        }
+
         .cards {
+            max-width: 1100px;
+            margin: auto;
             display: grid;
             grid-template-columns: repeat(3, 1fr);
             gap: 25px;
-            max-width: 1100px;
-            margin: auto;
         }
 
         .card {
             background: white;
             padding: 35px 28px;
             border-radius: 8px;
-            box-shadow: 0 10px 35px rgba(0,0,0,0.07);
+            box-shadow: 0 10px 35px rgba(0, 0, 0, 0.07);
             transition: 0.3s;
         }
 
         .card:hover {
             transform: translateY(-7px);
-            box-shadow: 0 18px 45px rgba(0,0,0,0.12);
+            box-shadow: 0 18px 45px rgba(0, 0, 0, 0.12);
         }
 
         .card h3 {
@@ -211,26 +236,78 @@
             color: #666;
         }
 
-        /* RESEARCH */
+        /* ================= FACULTY ================= */
+
+        .faculty {
+            background: white;
+        }
+
+        .faculty-box {
+            max-width: 950px;
+            margin: auto;
+            display: flex;
+            align-items: center;
+            gap: 40px;
+            padding: 40px;
+            background: #f7f3ec;
+            border-left: 5px solid #9b6b2f;
+            box-shadow: 0 12px 35px rgba(0, 0, 0, 0.06);
+        }
+
+        .faculty-box img {
+            width: 180px;
+            height: 210px;
+            object-fit: cover;
+            border-radius: 6px;
+            background: #ddd;
+        }
+
+        .faculty-info h3 {
+            font-size: 30px;
+            margin-bottom: 5px;
+        }
+
+        .faculty-info .department-name {
+            color: #9b6b2f;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+
+        .faculty-info p {
+            color: #666;
+        }
+
+        /* ================= RESEARCH ================= */
+
         .research {
-            background: #f1eee9;
+            background: #eee7dc;
         }
 
         .research-box {
             max-width: 900px;
-            margin: auto;
+            margin: 20px auto;
+            padding: 30px;
             background: white;
-            padding: 35px;
             border-left: 5px solid #9b6b2f;
-            margin-bottom: 20px;
-            box-shadow: 0 8px 25px rgba(0,0,0,0.06);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.06);
         }
 
         .research-box h3 {
             margin-bottom: 8px;
         }
 
-        /* GALLERY */
+        .research-box p {
+            color: #666;
+        }
+
+        /* ================= ACHIEVEMENTS ================= */
+
+        .achievements {
+            background: white;
+        }
+
+        /* ================= GALLERY ================= */
+
         .gallery {
             background: white;
         }
@@ -254,36 +331,67 @@
             width: 100%;
             height: 100%;
             object-fit: cover;
+            transition: 0.4s;
         }
 
-        /* CONTACT */
+        .gallery-item:hover img {
+            transform: scale(1.06);
+        }
+
+        /* ================= CONTACT ================= */
+
         .contact {
-            background: #111;
+            background: #171717;
             color: white;
             text-align: center;
         }
 
         .contact h2 {
-            font-size: 38px;
+            font-size: 40px;
             margin-bottom: 15px;
         }
 
         .contact p {
             color: #ccc;
-            margin-bottom: 10px;
+            margin-bottom: 8px;
         }
 
-        /* FOOTER */
+        .phone {
+            font-size: 20px;
+            font-weight: bold;
+            color: white !important;
+            margin: 15px 0 25px !important;
+        }
+
+        .call-button {
+            display: inline-block;
+            padding: 14px 30px;
+            background: #9b6b2f;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+            font-weight: bold;
+            transition: 0.3s;
+        }
+
+        .call-button:hover {
+            background: white;
+            color: #171717;
+        }
+
+        /* ================= FOOTER ================= */
+
         footer {
-            background: #080808;
-            color: #aaa;
+            background: #090909;
+            color: #999;
             text-align: center;
             padding: 25px;
             font-size: 14px;
         }
 
-        /* MOBILE */
-        @media (max-width: 800px) {
+        /* ================= MOBILE ================= */
+
+        @media (max-width: 850px) {
 
             nav {
                 padding: 15px 5%;
@@ -299,6 +407,10 @@
                 padding: 130px 6% 70px;
             }
 
+            .hero-text {
+                max-width: 100%;
+            }
+
             .profile {
                 width: 280px;
                 height: 350px;
@@ -306,6 +418,11 @@
 
             .cards {
                 grid-template-columns: 1fr;
+            }
+
+            .faculty-box {
+                flex-direction: column;
+                text-align: center;
             }
 
             .gallery-grid {
@@ -321,251 +438,401 @@
 
 <body>
 
-<!-- NAVIGATION -->
-<nav>
-    <div class="logo">Sumit <span>Guha</span></div>
+    <!-- ================= NAVIGATION ================= -->
 
-    <ul>
-        <li><a href="#about">About</a></li>
-        <li><a href="#research">Research</a></li>
-        <li><a href="#achievements">Achievements</a></li>
-        <li><a href="#gallery">Gallery</a></li>
-        <li><a href="#contact">Contact</a></li>
-    </ul>
-</nav>
+    <nav>
 
-
-<!-- HERO -->
-<header class="hero">
-
-    <div class="hero-text">
-
-        <div class="small-title">
-            DEPARTMENT OF MUSIC
+        <div class="logo">
+            Takshashila <span>Vidhyapeeth</span>
         </div>
 
-        <h1>
-            Sumit <span>Guha</span>
-        </h1>
+        <ul>
+            <li><a href="#about">About</a></li>
+            <li><a href="#department">Department</a></li>
+            <li><a href="#faculty">Faculty</a></li>
+            <li><a href="#research">Research</a></li>
+            <li><a href="#achievements">Achievements</a></li>
+            <li><a href="#gallery">Gallery</a></li>
+            <li><a href="#contact">Contact</a></li>
+        </ul>
 
-        <p>
-            Academic • Music • Research
-        </p>
+    </nav>
 
-        <p>
-            Welcome to the official academic profile of
-            Sumit Guha. Explore academic work, research,
-            achievements and professional activities.
-        </p>
 
-        <a href="#about" class="button">
-            Explore Profile
-        </a>
+    <!-- ================= HERO ================= -->
 
-        <a href="#contact" class="button button-outline">
+    <header class="hero">
+
+        <div class="hero-text">
+
+            <div class="tag">
+                TAKSHASHILA VIDHYAPEETH
+            </div>
+
+            <h1>
+                Department of <span>Music</span>
+            </h1>
+
+            <h2>
+                Knowledge • Culture • Creativity
+            </h2>
+
+            <p>
+                Welcome to the Department of Music at
+                Takshashila Vidhyapeeth. Explore academic
+                activities, faculty, research, achievements
+                and cultural contributions.
+            </p>
+
+            <a href="#about" class="button">
+                Explore
+            </a>
+
+            <a href="#contact" class="button outline">
+                Contact
+            </a>
+
+        </div>
+
+
+        <div class="profile">
+
+            <img src="teacher-photo.jpg"
+                alt="Sumit Guha - Department of Music">
+
+        </div>
+
+    </header>
+
+
+    <!-- ================= ABOUT ================= -->
+
+    <section id="about" class="about">
+
+        <div class="section-title">
+
+            <h2>About Takshashila Vidhyapeeth</h2>
+
+            <p>
+                Education • Knowledge • Cultural Excellence
+            </p>
+
+        </div>
+
+        <div class="about-content">
+
+            <p>
+                Takshashila Vidhyapeeth is dedicated to
+                academic learning, cultural development and
+                the pursuit of knowledge.
+
+                This website presents information about the
+                institution, its academic activities,
+                faculty and contributions.
+            </p>
+
+        </div>
+
+    </section>
+
+
+    <!-- ================= DEPARTMENT ================= -->
+
+    <section id="department" class="department">
+
+        <div class="section-title">
+
+            <h2>Department of Music</h2>
+
+            <p>
+                Exploring music through education,
+                performance and research
+            </p>
+
+        </div>
+
+
+        <div class="cards">
+
+            <div class="card">
+
+                <h3>Music Education</h3>
+
+                <p>
+                    Academic learning and understanding of
+                    music, theory and practical aspects.
+                </p>
+
+            </div>
+
+
+            <div class="card">
+
+                <h3>Performance</h3>
+
+                <p>
+                    Encouraging musical expression,
+                    performance and creative development.
+                </p>
+
+            </div>
+
+
+            <div class="card">
+
+                <h3>Music Research</h3>
+
+                <p>
+                    Academic exploration of music,
+                    culture and related fields.
+                </p>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- ================= FACULTY ================= -->
+
+    <section id="faculty" class="faculty">
+
+        <div class="section-title">
+
+            <h2>Faculty</h2>
+
+            <p>
+                Department of Music
+            </p>
+
+        </div>
+
+
+        <div class="faculty-box">
+
+            <img src="teacher-photo.jpg"
+                alt="Sumit Guha">
+
+
+            <div class="faculty-info">
+
+                <h3>
+                    Sumit Guha
+                </h3>
+
+                <div class="department-name">
+                    Department of Music
+                </div>
+
+                <p>
+                    Faculty profile, academic interests,
+                    professional activities, research work
+                    and contributions will be presented here.
+                </p>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- ================= RESEARCH ================= -->
+
+    <section id="research" class="research">
+
+        <div class="section-title">
+
+            <h2>
+                Research & Publications
+            </h2>
+
+            <p>
+                Academic work and research contributions
+            </p>
+
+        </div>
+
+
+        <div class="research-box">
+
+            <h3>
+                Research Papers
+            </h3>
+
+            <p>
+                Research papers and publications can be
+                added here with their title, journal,
+                publication year and downloadable files.
+            </p>
+
+        </div>
+
+
+        <div class="research-box">
+
+            <h3>
+                Academic Contributions
+            </h3>
+
+            <p>
+                Additional academic work, conferences,
+                seminars and contributions can be
+                displayed in this section.
+            </p>
+
+        </div>
+
+    </section>
+
+
+    <!-- ================= ACHIEVEMENTS ================= -->
+
+    <section id="achievements" class="achievements">
+
+        <div class="section-title">
+
+            <h2>
+                Achievements
+            </h2>
+
+            <p>
+                Academic and professional milestones
+            </p>
+
+        </div>
+
+
+        <div class="cards">
+
+            <div class="card">
+
+                <h3>
+                    Academic Excellence
+                </h3>
+
+                <p>
+                    Important academic achievements can
+                    be presented here.
+                </p>
+
+            </div>
+
+
+            <div class="card">
+
+                <h3>
+                    Professional Contributions
+                </h3>
+
+                <p>
+                    Professional activities and
+                    contributions can be listed here.
+                </p>
+
+            </div>
+
+
+            <div class="card">
+
+                <h3>
+                    Awards & Recognition
+                </h3>
+
+                <p>
+                    Awards, honours and recognitions can
+                    be added here.
+                </p>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- ================= GALLERY ================= -->
+
+    <section id="gallery" class="gallery">
+
+        <div class="section-title">
+
+            <h2>
+                Gallery
+            </h2>
+
+            <p>
+                Moments from Takshashila Vidhyapeeth
+            </p>
+
+        </div>
+
+
+        <div class="gallery-grid">
+
+            <div class="gallery-item">
+
+                <img src="photo1.jpg"
+                    alt="Takshashila Vidhyapeeth">
+
+            </div>
+
+
+            <div class="gallery-item">
+
+                <img src="photo2.jpg"
+                    alt="Department of Music">
+
+            </div>
+
+
+            <div class="gallery-item">
+
+                <img src="photo3.jpg"
+                    alt="Takshashila Vidhyapeeth">
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- ================= CONTACT ================= -->
+
+    <section id="contact" class="contact">
+
+        <h2>
             Contact
+        </h2>
+
+        <p>
+            For academic and professional enquiries
+        </p>
+
+        <p class="phone">
+            +91 9433741596
+        </p>
+
+        <a
+            href="tel:+919433741596"
+            class="call-button">
+            Call Now
         </a>
 
-    </div>
+    </section>
 
 
-    <!-- TEACHER PHOTO -->
-    <div class="profile">
+    <!-- ================= FOOTER ================= -->
 
-        <!--
-        Replace teacher-photo.jpg with the actual photo
-        after uploading it to GitHub.
-        -->
+    <footer>
 
-        <img src="teacher-photo.jpg"
-             alt="Sumit Guha">
+        © 2026 Takshashila Vidhyapeeth
+        | Department of Music
 
-    </div>
-
-</header>
-
-
-<!-- ABOUT -->
-<section id="about" class="about">
-
-    <div class="section-title">
-        <h2>About</h2>
-        <p>Academic Profile</p>
-    </div>
-
-    <div class="about-content">
-
-        <p>
-            Sumit Guha is associated with the
-            <strong>Department of Music</strong>.
-            This website presents an overview of his
-            academic journey, professional activities,
-            research interests and contributions.
-        </p>
-
-    </div>
-
-</section>
-
-
-<!-- AREAS -->
-<section>
-
-    <div class="section-title">
-        <h2>Areas of Work</h2>
-        <p>Academic and professional interests</p>
-    </div>
-
-    <div class="cards">
-
-        <div class="card">
-            <h3>Music</h3>
-            <p>
-                Academic and professional engagement
-                with music and related disciplines.
-            </p>
-        </div>
-
-        <div class="card">
-            <h3>Research</h3>
-            <p>
-                Research activities, publications and
-                academic contributions.
-            </p>
-        </div>
-
-        <div class="card">
-            <h3>Education</h3>
-            <p>
-                Teaching, learning and academic
-                development in the field of music.
-            </p>
-        </div>
-
-    </div>
-
-</section>
-
-
-<!-- RESEARCH -->
-<section id="research" class="research">
-
-    <div class="section-title">
-        <h2>Research & Publications</h2>
-        <p>Academic work and research contributions</p>
-    </div>
-
-    <div class="research-box">
-
-        <h3>Research Paper Title</h3>
-
-        <p>
-            Research paper information will be added here.
-            You can later add the title, publication,
-            journal, year and a link to the paper.
-        </p>
-
-    </div>
-
-    <div class="research-box">
-
-        <h3>Research & Academic Work</h3>
-
-        <p>
-            Additional research papers, publications and
-            academic achievements can be listed in this section.
-        </p>
-
-    </div>
-
-</section>
-
-
-<!-- ACHIEVEMENTS -->
-<section id="achievements">
-
-    <div class="section-title">
-        <h2>Achievements</h2>
-        <p>Academic and professional milestones</p>
-    </div>
-
-    <div class="cards">
-
-        <div class="card">
-            <h3>Academic Achievement</h3>
-            <p>
-                Add important academic achievements here.
-            </p>
-        </div>
-
-        <div class="card">
-            <h3>Professional Work</h3>
-            <p>
-                Add professional activities and contributions here.
-            </p>
-        </div>
-
-        <div class="card">
-            <h3>Awards & Recognition</h3>
-            <p>
-                Add awards, honours and recognitions here.
-            </p>
-        </div>
-
-    </div>
-
-</section>
-
-
-<!-- GALLERY -->
-<section id="gallery" class="gallery">
-
-    <div class="section-title">
-        <h2>Gallery</h2>
-        <p>Photos and memories</p>
-    </div>
-
-    <div class="gallery-grid">
-
-        <div class="gallery-item">
-            <img src="photo1.jpg" alt="Gallery photo">
-        </div>
-
-        <div class="gallery-item">
-            <img src="photo2.jpg" alt="Gallery photo">
-        </div>
-
-        <div class="gallery-item">
-            <img src="photo3.jpg" alt="Gallery photo">
-        </div>
-
-    </div>
-
-</section>
-
-
-<!-- CONTACT -->
-<section id="contact" class="contact">
-
-    <h2>Contact</h2>
-
-    <p>
-        For academic or professional enquiries
-    </p>
-
-    <p>
-        Email: your-email@example.com
-    </p>
-
-</section>
-
-
-<!-- FOOTER -->
-<footer>
-
-    © 2026 Sumit Guha | Department of Music
-
-</footer>
+    </footer>
 
 </body>
+
 </html>
