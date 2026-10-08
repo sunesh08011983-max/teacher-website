@@ -4,6 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
   <title>Student Dashboard | Takshashila Vidhyapeeth</title>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -134,7 +135,8 @@
       border-collapse: collapse;
     }
 
-    th, td {
+    th,
+    td {
       padding: 12px 10px;
       border-bottom: 1px solid #e5e7eb;
       text-align: left;
@@ -179,16 +181,9 @@
       background: #2563eb;
       color: white;
       white-space: nowrap;
-    }
-
-    .download {
-      background: #111827;
-      color: white;
       text-decoration: none;
-      display: inline-block;
-      padding: 8px 12px;
-      border-radius: 7px;
-      font-size: 13px;
+      padding: 10px 15px;
+      border-radius: 8px;
     }
 
     .empty {
@@ -234,10 +229,6 @@
         grid-template-columns: 1fr;
       }
 
-      table {
-        min-width: 650px;
-      }
-
       section {
         overflow-x: auto;
       }
@@ -253,7 +244,9 @@
     <p>Student Dashboard — Department of Music</p>
   </div>
 
-  <button class="logout" id="logoutBtn">Logout</button>
+  <button class="logout" id="logoutBtn">
+    Logout
+  </button>
 </header>
 
 <div class="container">
@@ -261,7 +254,10 @@
   <div id="errorBox" class="error"></div>
 
   <div class="welcome">
-    <h2>Welcome, <span id="studentName">Loading...</span> 👋</h2>
+    <h2>
+      Welcome, <span id="studentName">Loading...</span> 👋
+    </h2>
+
     <p>Your student dashboard</p>
   </div>
 
@@ -340,6 +336,7 @@
 
     <div style="overflow-x:auto;">
       <table id="feesTable" style="display:none;">
+
         <thead>
           <tr>
             <th>Month</th>
@@ -351,6 +348,7 @@
         </thead>
 
         <tbody id="feesBody"></tbody>
+
       </table>
     </div>
   </section>
@@ -366,10 +364,496 @@
 
     <div style="overflow-x:auto;">
       <table id="receiptsTable" style="display:none;">
+
         <thead>
           <tr>
             <th>Receipt No.</th>
             <th>Month</th>
             <th>Amount</th>
             <th>Payment Date</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+
+        <tbody id="receiptsBody"></tbody>
+
+      </table>
+    </div>
+  </section>
+
+  <!-- LECTURES -->
+
+  <section>
+    <h2>Lectures & Videos</h2>
+
+    <div id="lecturesLoading" class="loading">
+      Loading lectures...
+    </div>
+
+    <div id="lecturesList"></div>
+  </section>
+
+</div>
+
+<script>
+
+  const SUPABASE_URL =
+    "https://ifehzphaiekcaplckjfl.supabase.co";
+
+  const SUPABASE_KEY =
+    "sb_publishable_8RwWggD47qMdZfveDF4DIg_Ql29_OoJ";
+
+  const { createClient } = supabase;
+
+  const db = createClient(
+    SUPABASE_URL,
+    SUPABASE_KEY
+  );
+
+
+  let currentUser = null;
+  let currentStudent = null;
+
+
+  function showError(message) {
+
+    const box =
+      document.getElementById("errorBox");
+
+    box.textContent = message;
+
+    box.style.display = "block";
+  }
+
+
+  function hideError() {
+
+    const box =
+      document.getElementById("errorBox");
+
+    box.style.display = "none";
+  }
+
+
+  function escapeHtml(value) {
+
+    if (value === null || value === undefined) {
+      return "";
+    }
+
+    return String(value)
+      .replaceAll("&", "&amp;")
+      .replaceAll("<", "&lt;")
+      .replaceAll(">", "&gt;")
+      .replaceAll('"', "&quot;")
+      .replaceAll("'", "&#039;");
+  }
+
+
+  async function initialize() {
+
+    hideError();
+
+    const {
+      data: {
+        session
+      }
+    } = await db.auth.getSession();
+
+
+    if (!session) {
+
+      window.location.href = "login.html";
+
+      return;
+    }
+
+
+    currentUser = session.user;
+
+
+    const {
+      data: student,
+      error: studentError
+    } = await db
+      .from("students")
+      .select("*")
+      .eq("user_id", currentUser.id)
+      .single();
+
+
+    if (studentError || !student) {
+
+      showError(
+        "Student profile could not be loaded. Please contact the administrator."
+      );
+
+      return;
+    }
+
+
+    currentStudent = student;
+
+
+    loadProfile();
+
+    await loadFees();
+
+    await loadReceipts();
+
+    await loadLectures();
+
+  }
+
+
+  function loadProfile() {
+
+    const student = currentStudent;
+
+
+    document.getElementById("studentName").textContent =
+      student.full_name || "Student";
+
+
+    document.getElementById("studentId").textContent =
+      student.student_id || "—";
+
+
+    document.getElementById("studentClass").textContent =
+      student.class_name || "—";
+
+
+    document.getElementById("profileName").textContent =
+      student.full_name || "—";
+
+
+    document.getElementById("profileStudentId").textContent =
+      student.student_id || "—";
+
+
+    document.getElementById("profileEmail").textContent =
+      student.email || currentUser.email || "—";
+
+
+    document.getElementById("profilePhone").textContent =
+      student.phone || "—";
+
+
+    document.getElementById("profileClass").textContent =
+      student.class_name || "—";
+
+
+    document.getElementById("profileStatus").textContent =
+      student.active ? "Active" : "Inactive";
+
+  }
+
+
+  async function loadFees() {
+
+    const loading =
+      document.getElementById("feesLoading");
+
+    const table =
+      document.getElementById("feesTable");
+
+    const body =
+      document.getElementById("feesBody");
+
+
+    const {
+      data,
+      error
+    } = await db
+      .from("fees")
+      .select("*")
+      .eq("student_id", currentStudent.user_id)
+      .order("payment_date", {
+        ascending: false
+      });
+
+
+    loading.style.display = "none";
+
+
+    if (error) {
+
+      showError(
+        "Could not load fee records: " +
+        error.message
+      );
+
+      return;
+    }
+
+
+    let paidTotal = 0;
+    let pendingTotal = 0;
+
+
+    if (!data || data.length === 0) {
+
+      body.innerHTML =
+        '<tr><td colspan="5" class="empty">No fee records found.</td></tr>';
+
+      table.style.display = "table";
+
+      return;
+    }
+
+
+    body.innerHTML = data.map(fee => {
+
+      const amount =
+        Number(fee.amount || 0);
+
+
+      const status =
+        String(fee.status || "unpaid")
+          .toLowerCase();
+
+
+      if (status === "paid") {
+        paidTotal += amount;
+      } else {
+        pendingTotal += amount;
+      }
+
+
+      return `
+        <tr>
+
+          <td>
+            ${escapeHtml(fee.month)}
+          </td>
+
+          <td>
+            ₹${amount.toLocaleString("en-IN")}
+          </td>
+
+          <td class="${status === "paid" ? "paid" : "unpaid"}">
+            ${escapeHtml(fee.status || "Unpaid")}
+          </td>
+
+          <td>
+            ${escapeHtml(fee.payment_date || "—")}
+          </td>
+
+          <td>
+            ${escapeHtml(fee.receipt_number || "—")}
+          </td>
+
+        </tr>
+      `;
+
+    }).join("");
+
+
+    document.getElementById("paidFees").textContent =
+      "₹" + paidTotal.toLocaleString("en-IN");
+
+
+    document.getElementById("pendingFees").textContent =
+      "₹" + pendingTotal.toLocaleString("en-IN");
+
+
+    table.style.display = "table";
+
+  }
+
+
+  async function loadReceipts() {
+
+    const loading =
+      document.getElementById("receiptsLoading");
+
+    const table =
+      document.getElementById("receiptsTable");
+
+    const body =
+      document.getElementById("receiptsBody");
+
+
+    const {
+      data,
+      error
+    } = await db
+      .from("receipts")
+      .select("*")
+      .eq("student_id", currentStudent.user_id)
+      .order("payment_date", {
+        ascending: false
+      });
+
+
+    loading.style.display = "none";
+
+
+    if (error) {
+
+      showError(
+        "Could not load receipts: " +
+        error.message
+      );
+
+      return;
+    }
+
+
+    if (!data || data.length === 0) {
+
+      body.innerHTML =
+        '<tr><td colspan="5" class="empty">No receipts found.</td></tr>';
+
+      table.style.display = "table";
+
+      return;
+    }
+
+
+    body.innerHTML = data.map(receipt => {
+
+      const status =
+        String(receipt.status || "paid")
+          .toLowerCase();
+
+
+      return `
+        <tr>
+
+          <td>
+            ${escapeHtml(receipt.receipt_number || "—")}
+          </td>
+
+          <td>
+            ${escapeHtml(receipt.month || "—")}
+          </td>
+
+          <td>
+            ₹${Number(receipt.amount || 0).toLocaleString("en-IN")}
+          </td>
+
+          <td>
+            ${escapeHtml(receipt.payment_date || "—")}
+          </td>
+
+          <td class="${status === "paid" ? "paid" : "unpaid"}">
+            ${escapeHtml(receipt.status || "Paid")}
+          </td>
+
+        </tr>
+      `;
+
+    }).join("");
+
+
+    table.style.display = "table";
+
+  }
+
+
+  async function loadLectures() {
+
+    const loading =
+      document.getElementById("lecturesLoading");
+
+    const list =
+      document.getElementById("lecturesList");
+
+
+    const {
+      data,
+      error
+    } = await db
+      .from("lectures")
+      .select("*")
+      .eq("published", true)
+      .order("created_at", {
+        ascending: false
+      });
+
+
+    loading.style.display = "none";
+
+
+    if (error) {
+
+      showError(
+        "Could not load lectures: " +
+        error.message
+      );
+
+      return;
+    }
+
+
+    if (!data || data.length === 0) {
+
+      list.innerHTML =
+        '<p class="empty">No lectures have been published yet.</p>';
+
+      return;
+    }
+
+
+    list.innerHTML = data.map(lecture => {
+
+      const videoUrl =
+        lecture.video_url || "#";
+
+
+      return `
+        <div class="video">
+
+          <div>
+
+            <h3>
+              ${escapeHtml(
+                lecture.title || "Lecture"
+              )}
+            </h3>
+
+            <p>
+              ${escapeHtml(
+                lecture.description ||
+                "No description available."
+              )}
+            </p>
+
+          </div>
+
+          <a
+            class="watch"
+            href="${escapeHtml(videoUrl)}"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Watch Lecture
+          </a>
+
+        </div>
+      `;
+
+    }).join("");
+
+  }
+
+
+  document
+    .getElementById("logoutBtn")
+    .addEventListener("click", async () => {
+
+      await db.auth.signOut();
+
+      window.location.href = "login.html";
+
+    });
+
+
+  initialize();
+
+</script>
+
+</body>
+</html>
 ```
