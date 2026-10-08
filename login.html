@@ -1,17 +1,21 @@
 ```html
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <title>Login | Takshashila Vidhyapeeth</title>
 
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
   <style>
     * {
       box-sizing: border-box;
       margin: 0;
       padding: 0;
+      font-family: Arial, sans-serif;
     }
 
     body {
@@ -19,88 +23,95 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      font-family: Arial, Helvetica, sans-serif;
-      background: linear-gradient(135deg, #171717, #3b2a1d);
+      background: #f4f6f8;
       padding: 20px;
     }
 
     .login-box {
       width: 100%;
-      max-width: 430px;
+      max-width: 420px;
       background: white;
-      padding: 40px 32px;
-      border-radius: 22px;
-      box-shadow: 0 15px 50px rgba(0,0,0,0.3);
+      padding: 32px;
+      border-radius: 16px;
+      box-shadow: 0 5px 25px rgba(0, 0, 0, 0.10);
+    }
+
+    h1 {
       text-align: center;
-    }
-
-    .login-box h1 {
-      color: #3b2a1d;
       margin-bottom: 8px;
+      color: #111827;
     }
 
-    .login-box h2 {
-      color: #c99d3b;
-      font-size: 20px;
-      margin-bottom: 30px;
-      font-weight: normal;
+    .subtitle {
+      text-align: center;
+      color: #666;
+      margin-bottom: 25px;
+      font-size: 14px;
     }
 
-    .login-box input {
+    input {
       width: 100%;
-      padding: 14px;
+      padding: 13px;
       margin-bottom: 15px;
-      border: 1px solid #ddd;
-      border-radius: 10px;
+      border: 1px solid #d1d5db;
+      border-radius: 8px;
       font-size: 15px;
       outline: none;
     }
 
-    .login-box input:focus {
-      border-color: #c99d3b;
+    input:focus {
+      border-color: #111827;
     }
 
-    .login-button {
+    button {
       width: 100%;
-      padding: 14px;
+      padding: 13px;
       border: none;
-      border-radius: 25px;
-      background: #3b2a1d;
+      border-radius: 8px;
+      background: #111827;
       color: white;
       font-size: 16px;
-      font-weight: bold;
       cursor: pointer;
     }
 
-    .login-button:hover {
-      background: #5a3d25;
+    button:hover {
+      opacity: 0.9;
     }
 
-    .forgot-link {
-      display: inline-block;
-      margin-top: 15px;
-      color: #c99d3b;
+    button:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    .forgot {
+      display: block;
+      text-align: center;
+      margin-top: 16px;
+      color: #2563eb;
       text-decoration: none;
       font-size: 14px;
       cursor: pointer;
     }
 
-    .forgot-link:hover {
+    .forgot:hover {
       text-decoration: underline;
     }
 
-    #message {
+    .back {
+      display: block;
+      text-align: center;
       margin-top: 18px;
-      font-size: 14px;
-      min-height: 20px;
-    }
-
-    .back-link {
-      display: inline-block;
-      margin-top: 22px;
-      color: #3b2a1d;
+      color: #555;
       text-decoration: none;
       font-size: 14px;
+    }
+
+    #message {
+      text-align: center;
+      margin-top: 15px;
+      font-size: 14px;
+      line-height: 1.5;
+      word-break: break-word;
     }
   </style>
 </head>
@@ -109,55 +120,59 @@
 
   <div class="login-box">
 
-    <h1>Takshashila Vidhyapeeth</h1>
+    <h1>Login</h1>
 
-    <h2>Secure Login</h2>
+    <p class="subtitle">
+      Takshashila Vidhyapeeth
+    </p>
 
-    <form id="loginForm">
+    <input
+      type="email"
+      id="email"
+      placeholder="Email address"
+      autocomplete="email"
+      required
+    >
 
-      <input
-        type="email"
-        id="email"
-        placeholder="Email Address"
-        required
-      >
+    <input
+      type="password"
+      id="password"
+      placeholder="Password"
+      autocomplete="current-password"
+      required
+    >
 
-      <input
-        type="password"
-        id="password"
-        placeholder="Password"
-        required
-      >
+    <button id="loginBtn">
+      Login
+    </button>
 
-      <button type="submit" class="login-button">
-        Login
-      </button>
-
-    </form>
-
-    <a href="#" id="forgotPassword" class="forgot-link">
+    <a class="forgot" id="forgotBtn">
       Forgot Password?
     </a>
 
-    <div id="message"></div>
+    <p id="message"></p>
 
-    <a href="index.html" class="back-link">
+    <a class="back" href="index.html">
       ← Back to Website
     </a>
 
   </div>
 
-
-  <!-- Supabase -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <script>
 
     const SUPABASE_URL =
       "https://ifehzphaiekcaplckjfl.supabase.co";
 
+
+    /*
+      IMPORTANT:
+      Replace YOUR_PUBLISHABLE_KEY with your
+      Supabase Publishable → Default key.
+    */
+
     const SUPABASE_KEY =
-      "sb_publishable_8RwWggD47qMdZfveDF4DIg_Ql29_OoJ";
+      "YOUR_PUBLISHABLE_KEY";
 
 
     const { createClient } = supabase;
@@ -167,465 +182,292 @@
       SUPABASE_KEY
     );
 
+
+    const loginBtn =
+      document.getElementById("loginBtn");
+
+    const forgotBtn =
+      document.getElementById("forgotBtn");
 
     const message =
       document.getElementById("message");
 
 
-    /* =========================
-       NORMAL LOGIN
-       ========================= */
+    function showMessage(text, color = "#111827") {
 
-    document
-      .getElementById("loginForm")
-      .addEventListener("submit", async function(event) {
+      message.textContent = text;
+      message.style.color = color;
 
-        event.preventDefault();
+    }
 
 
-        const email =
-          document
-            .getElementById("email")
-            .value
-            .trim();
+    // =========================
+    // NORMAL LOGIN
+    // =========================
+
+    loginBtn.addEventListener("click", async () => {
+
+      const email =
+        document.getElementById("email").value.trim();
+
+      const password =
+        document.getElementById("password").value;
 
 
-        const password =
-          document
-            .getElementById("password")
-            .value;
+      if (!email || !password) {
+
+        showMessage(
+          "Please enter your email and password.",
+          "red"
+        );
+
+        return;
+
+      }
 
 
-        message.textContent =
-          "Logging in...";
+      loginBtn.disabled = true;
 
-        message.style.color =
-          "#555";
+      showMessage("Logging in...");
 
 
-        const { data, error } =
-          await db.auth.signInWithPassword({
-            email: email,
-            password: password
-          });
+      const {
+        data,
+        error
+      } = await db.auth.signInWithPassword({
 
+        email: email,
 
-        if (error) {
-
-          message.textContent =
-            "Supabase Error: " + error.message;
-
-          message.style.color =
-            "red";
-
-          console.error(
-            "Login error:",
-            error
-          );
-
-          return;
-        }
-
-
-        const user =
-          data.user;
-
-
-        /* =========================
-           CHECK USER PROFILE
-           ========================= */
-
-        const {
-          data: profile,
-          error: profileError
-        } =
-          await db
-            .from("profiles")
-            .select("role, full_name")
-            .eq("id", user.id)
-            .single();
-
-
-        if (
-          profileError ||
-          !profile
-        ) {
-
-          message.textContent =
-            "Your account profile is not configured.";
-
-          message.style.color =
-            "red";
-
-
-          await db.auth.signOut();
-
-          return;
-        }
-
-
-        /* =========================
-           ROLE REDIRECT
-           ========================= */
-
-        if (
-          profile.role === "admin"
-        ) {
-
-          window.location.href =
-            "admin.html";
-
-        }
-
-        else if (
-          profile.role === "student"
-        ) {
-
-          window.location.href =
-            "student.html";
-
-        }
-
-        else {
-
-          message.textContent =
-            "Invalid account role.";
-
-          message.style.color =
-            "red";
-
-
-          await db.auth.signOut();
-        }
+        password: password
 
       });
 
 
-    /* =========================
-       FORGOT PASSWORD
-       ========================= */
+      if (error) {
 
-    document
-      .getElementById("forgotPassword")
-      .addEventListener("click", async function(event) {
+        console.error(
+          "LOGIN ERROR:",
+          error
+        );
 
-        event.preventDefault();
+        showMessage(
+          "Supabase Error: " + error.message,
+          "red"
+        );
+
+        loginBtn.disabled = false;
+
+        return;
+
+      }
 
 
-        const email =
-          document
-            .getElementById("email")
-            .value
-            .trim();
+      if (!data || !data.user) {
+
+        showMessage(
+          "Login failed: user information not found.",
+          "red"
+        );
+
+        loginBtn.disabled = false;
+
+        return;
+
+      }
 
 
-        if (!email) {
+      const user = data.user;
 
-          message.textContent =
-            "Please enter your email address first.";
 
-          message.style.color =
-            "red";
+      // =========================
+      // GET USER PROFILE
+      // =========================
 
-          return;
+      showMessage("Checking account profile...");
+
+
+      const {
+        data: profile,
+        error: profileError
+      } = await db
+
+        .from("profiles")
+
+        .select("role, full_name")
+
+        .eq("id", user.id)
+
+        .single();
+
+
+      if (profileError) {
+
+        console.error(
+          "PROFILE ERROR:",
+          profileError
+        );
+
+        showMessage(
+          "Profile Error: " +
+          profileError.message +
+          " | Code: " +
+          (profileError.code || "unknown"),
+          "red"
+        );
+
+        await db.auth.signOut();
+
+        loginBtn.disabled = false;
+
+        return;
+
+      }
+
+
+      if (!profile) {
+
+        showMessage(
+          "No profile found for this account.",
+          "red"
+        );
+
+        await db.auth.signOut();
+
+        loginBtn.disabled = false;
+
+        return;
+
+      }
+
+
+      // =========================
+      // ADMIN
+      // =========================
+
+      if (profile.role === "admin") {
+
+        window.location.href = "admin.html";
+
+        return;
+
+      }
+
+
+      // =========================
+      // STUDENT
+      // =========================
+
+      if (profile.role === "student") {
+
+        window.location.href = "student.html";
+
+        return;
+
+      }
+
+
+      // =========================
+      // UNKNOWN ROLE
+      // =========================
+
+      showMessage(
+        "Account profile found, but the role is not configured.",
+        "red"
+      );
+
+
+      await db.auth.signOut();
+
+      loginBtn.disabled = false;
+
+    });
+
+
+    // =========================
+    // FORGOT PASSWORD
+    // =========================
+
+    forgotBtn.addEventListener("click", async () => {
+
+      const email =
+        document.getElementById("email").value.trim();
+
+
+      if (!email) {
+
+        showMessage(
+          "Enter your email address first.",
+          "red"
+        );
+
+        return;
+
+      }
+
+
+      forgotBtn.style.pointerEvents = "none";
+
+      showMessage(
+        "Sending password reset email..."
+      );
+
+
+      const {
+        error
+      } = await db.auth.resetPasswordForEmail(
+
+        email,
+
+        {
+          redirectTo:
+            "https://sunesh08011983-max.github.io/teacher-website/reset-password.html"
         }
 
-
-        message.textContent =
-          "Sending password reset email...";
-
-        message.style.color =
-          "#555";
+      );
 
 
-        const { error } =
-          await db.auth.resetPasswordForEmail(
-            email,
-            {
-              redirectTo:
-                "https://sunesh08011983-max.github.io/teacher-website/reset-password.html"
-            }
-          );
+      if (error) {
+
+        console.error(
+          "PASSWORD RESET ERROR:",
+          error
+        );
+
+        showMessage(
+          "Password reset error: " +
+          error.message,
+          "red"
+        );
+
+        forgotBtn.style.pointerEvents = "auto";
+
+        return;
+
+      }
 
 
-        if (error) {
-
-          message.textContent =
-            "Reset failed: " +
-            error.message;
-
-          message.style.color =
-            "red";
-
-          console.error(
-            "Password reset error:",
-            error
-          );
-
-          return;
-        }
+      showMessage(
+        "Password reset email sent. Check your inbox.",
+        "green"
+      );
 
 
-        message.textContent =
-          "Password reset email sent. Please check your inbox.";
+      /*
+        Do not repeatedly click Forgot Password.
+        Supabase applies rate limits to recovery emails.
+      */
 
-        message.style.color =
-          "green";
+      setTimeout(() => {
 
-      });
+        forgotBtn.style.pointerEvents = "auto";
+
+      }, 60000);
+
+    });
 
   </script>
 
 </body>
-</html>
-```
-```html
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <title>Login | Takshashila Vidhyapeeth</title>
-
-  <style>
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
-
-    body {
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-family: Arial, Helvetica, sans-serif;
-      background: linear-gradient(135deg, #171717, #3b2a1d);
-      padding: 20px;
-    }
-
-    .login-box {
-      width: 100%;
-      max-width: 430px;
-      background: white;
-      padding: 40px 32px;
-      border-radius: 22px;
-      box-shadow: 0 15px 50px rgba(0,0,0,0.3);
-      text-align: center;
-    }
-
-    .login-box h1 {
-      color: #3b2a1d;
-      margin-bottom: 8px;
-    }
-
-    .login-box h2 {
-      color: #c99d3b;
-      font-size: 20px;
-      margin-bottom: 30px;
-      font-weight: normal;
-    }
-
-    .login-box input {
-      width: 100%;
-      padding: 14px;
-      margin-bottom: 15px;
-      border: 1px solid #ddd;
-      border-radius: 10px;
-      font-size: 15px;
-      outline: none;
-    }
-
-    .login-box input:focus {
-      border-color: #c99d3b;
-    }
-
-    .login-button {
-      width: 100%;
-      padding: 14px;
-      border: none;
-      border-radius: 25px;
-      background: #3b2a1d;
-      color: white;
-      font-size: 16px;
-      font-weight: bold;
-      cursor: pointer;
-    }
-
-    .login-button:hover {
-      background: #5a3d25;
-    }
-
-    #message {
-      margin-top: 18px;
-      font-size: 14px;
-      min-height: 20px;
-    }
-
-    .back-link {
-      display: inline-block;
-      margin-top: 22px;
-      color: #3b2a1d;
-      text-decoration: none;
-      font-size: 14px;
-    }
-  </style>
-</head>
-
-<body>
-
-  <div class="login-box">
-
-    <h1>Takshashila Vidhyapeeth</h1>
-
-    <h2>Secure Login</h2>
-
-    <form id="loginForm">
-
-      <input
-        type="email"
-        id="email"
-        placeholder="Email Address"
-        required
-      >
-
-      <input
-        type="password"
-        id="password"
-        placeholder="Password"
-        required
-      >
-
-      <button type="submit" class="login-button">
-        Login
-      </button>
-
-    </form>
-
-    <div id="message"></div>
-
-    <a href="index.html" class="back-link">
-      ← Back to Website
-    </a>
-
-  </div>
-
-
-  <!-- Supabase -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
-  <script>
-
-    /*
-      IMPORTANT:
-      Replace ONLY these two values with your own
-      Supabase Project URL and Publishable Key.
-
-      NEVER put your Secret / Service Role key here.
-    */
-
-    const SUPABASE_URL = "https://ifehzphaiekcaplckjfl.supabase.co";
-    const SUPABASE_KEY = "sb_publishable_8RwWggD47qMdZfveDF4DIg_Ql29_OoJ";
-
-    const { createClient } = supabase;
-
-    const db = createClient(
-      SUPABASE_URL,
-      SUPABASE_KEY
-    );
-
-
-    document
-      .getElementById("loginForm")
-      .addEventListener("submit", async function(event) {
-
-        event.preventDefault();
-
-        const email =
-          document.getElementById("email").value.trim();
-
-        const password =
-          document.getElementById("password").value;
-
-        const message =
-          document.getElementById("message");
-
-        message.textContent = "Logging in...";
-        message.style.color = "#555";
-
-
-        const { data, error } =
-          await db.auth.signInWithPassword({
-            email: email,
-            password: password
-          });
-
-
-       if (error) {
-
-  message.textContent =
-    "Supabase Error: " + error.message;
-
-  message.style.color = "red";
-
-  console.error("Login error:", error);
-
-  return;
-}
-
-
-        const user = data.user;
-
-
-        const { data: profile, error: profileError } =
-          await db
-            .from("profiles")
-            .select("role, full_name")
-            .eq("id", user.id)
-            .single();
-
-
-        if (profileError || !profile) {
-
-          message.textContent =
-            "Your account profile is not configured.";
-
-          message.style.color = "red";
-
-          await db.auth.signOut();
-
-          return;
-        }
-
-
-        if (profile.role === "admin") {
-
-          window.location.href = "admin.html";
-
-        }
-
-        else if (profile.role === "student") {
-
-          window.location.href = "student.html";
-
-        }
-
-        else {
-
-          message.textContent =
-            "Invalid account role.";
-
-          message.style.color = "red";
-
-          await db.auth.signOut();
-
-        }
-
-      });
-
-  </script>
-
-</body>
 </html>
 ```
