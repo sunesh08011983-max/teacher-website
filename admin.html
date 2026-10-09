@@ -1,2280 +1,545 @@
-\<!DOCTYPE html>
-\<html lang="en">
-\<head>
-  \<meta charset="UTF-8">
-  \<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-  \<title>Admin Dashboard | Takshashila Vidhyapeeth\</title>
-
-  \<script src="[https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2](https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2)">\</script>
-
-  \<style>
-    \* {
-      box-sizing: border-box;
-    }
-
-    body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background: #f4f6f8;
-      color: #222;
-    }
-
-    header {
-      background: #111827;
-      color: white;
-      padding: 18px 24px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 15px;
-    }
-
-    header h1 {
-      margin: 0;
-      font-size: 22px;
-    }
-
-    header p {
-      margin: 5px 0 0;
-      color: #d1d5db;
-      font-size: 14px;
-    }
-
-    button {
-      border: 0;
-      border-radius: 8px;
-      padding: 10px 15px;
-      cursor: pointer;
-      font-size: 14px;
-      background: #2563eb;
-      color: white;
-    }
-
-    button\:hover {
-      opacity: 0.9;
-    }
-
-    button.danger {
-      background: #dc2626;
-    }
-
-    button.secondary {
-      background: #6b7280;
-    }
-
-    button.success {
-      background: #16a34a;
-    }
-
-    .container {
-      max-width: 1200px;
-      margin: 25px auto;
-      padding: 0 15px;
-    }
-
-    .stats {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 15px;
-      margin-bottom: 20px;
-    }
-
-    .stat {
-      background: white;
-      padding: 20px;
-      border-radius: 12px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
-    }
-
-    .stat h3 {
-      margin: 0 0 8px;
-      font-size: 14px;
-      color: #6b7280;
-    }
-
-    .stat strong {
-      font-size: 28px;
-    }
-
-    .tabs {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      margin-bottom: 20px;
-    }
-
-    .tab {
-      background: #e5e7eb;
-      color: #111827;
-    }
-
-    .tab.active {
-      background: #2563eb;
-      color: white;
-    }
-
-    .section {
-      display: none;
-    }
-
-    .section.active {
-      display: block;
-    }
-
-    .card {
-      background: white;
-      border-radius: 12px;
-      padding: 20px;
-      margin-bottom: 20px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
-    }
-
-    .card h2 {
-      margin-top: 0;
-    }
-
-    .form-grid {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 14px;
-    }
-
-    .full {
-      grid-column: 1 / -1;
-    }
-
-    label {
-      display: block;
-      font-size: 14px;
-      font-weight: bold;
-      margin-bottom: 6px;
-    }
-
-    input,
-    select,
-    textarea {
-      width: 100%;
-      padding: 11px;
-      border: 1px solid #d1d5db;
-      border-radius: 8px;
-      font-size: 14px;
-    }
-
-    textarea {
-      min-height: 90px;
-      resize: vertical;
-    }
-
-    .form-actions {
-      margin-top: 15px;
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
-    }
-
-    .message {
-      margin-top: 12px;
-      padding: 10px;
-      border-radius: 8px;
-      display: none;
-    }
-
-    .message.show {
-      display: block;
-    }
-
-    .message.success {
-      background: #dcfce7;
-      color: #166534;
-    }
-
-    .message.error {
-      background: #fee2e2;
-      color: #991b1b;
-    }
-
-    .table-wrap {
-      overflow-x: auto;
-    }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      min-width: 700px;
-    }
-
-    th,
-    td {
-      text-align: left;
-      padding: 11px;
-      border-bottom: 1px solid #e5e7eb;
-      font-size: 14px;
-    }
-
-    th {
-      background: #f9fafb;
-    }
-
-    .badge {
-      display: inline-block;
-      padding: 5px 9px;
-      border-radius: 20px;
-      font-size: 12px;
-      font-weight: bold;
-    }
-
-    .paid {
-      background: #dcfce7;
-      color: #166534;
-    }
-
-    .unpaid {
-      background: #fee2e2;
-      color: #991b1b;
-    }
-
-    .published {
-      background: #dbeafe;
-      color: #1e40af;
-    }
-
-    .draft {
-      background: #f3f4f6;
-      color: #4b5563;
-    }
-
-    .small {
-      font-size: 12px;
-      color: #6b7280;
-      margin-top: 5px;
-    }
-
-    .password-note {
-      background: #eff6ff;
-      color: #1e40af;
-      padding: 10px;
-      border-radius: 8px;
-      font-size: 13px;
-      margin-bottom: 15px;
-    }
-
-    .loading {
-      opacity: 0.6;
-      pointer-events: none;
-    }
-
-    @media (max-width: 800px) {
-      .stats {
-        grid-template-columns: repeat(2, 1fr);
-      }
-
-      .form-grid {
-        grid-template-columns: 1fr;
-      }
-
-      .full {
-        grid-column: auto;
-      }
-    }
-
-    @media (max-width: 500px) {
-      .stats {
-        grid-template-columns: 1fr;
-      }
-
-      header {
-        flex-direction: column;
-        align-items: flex-start;
-      }
-    }
-  \</style>
-\</head>
-
-\<body>
-
-\<header>
-  \<div>
-    \<h1>Admin Dashboard\</h1>
-    \<p>Takshashila Vidhyapeeth — Department of Music\</p>
-    \<p id="adminName">Checking admin...\</p>
-  \</div>
-
-  \<button id="logoutBtn" class="danger">Logout\</button>
-\</header>
-
-\<div class="container">
-
-  \<!-- STATS -->
-  \<div class="stats">
-    \<div class="stat">
-      \<h3>Students\</h3>
-      \<strong id="studentCount">0\</strong>
-    \</div>
-
-    \<div class="stat">
-      \<h3>Paid Fees\</h3>
-      \<strong id="paidCount">0\</strong>
-    \</div>
-
-    \<div class="stat">
-      \<h3>Unpaid Fees\</h3>
-      \<strong id="unpaidCount">0\</strong>
-    \</div>
-
-    \<div class="stat">
-      \<h3>Lectures\</h3>
-      \<strong id="lectureCount">0\</strong>
-    \</div>
-  \</div>
-
-  \<!-- TABS -->
-  \<div class="tabs">
-    \<button class="tab active" data-tab="studentsSection">Students\</button>
-    \<button class="tab" data-tab="feesSection">Fees\</button>
-    \<button class="tab" data-tab="receiptsSection">Receipts\</button>
-    \<button class="tab" data-tab="lecturesSection">Lectures\</button>
-  \</div>
-
-
-
-  \<!-- ================= STUDENTS ================= -->
-
-  \<section id="studentsSection" class="section active">
-
-    \<div class="card">
-
-      \<h2>Add Student\</h2>
-
-      \<div class="password-note">
-        The student's Supabase login account will be created automatically.
-        Give the student the email and initial password you enter below.
-        The student can later use Forgot Password.
-      \</div>
-
-      \<form id="studentForm">
-
-        \<div class="form-grid">
-
-          \<div>
-            \<label>Full Name \*\</label>
-            \<input
-              type="text"
-              id="studentName"
-              required
-              placeholder="Student full name"
-            \>
-          \</div>
-
-          \<div>
-            \<label>Student ID \*\</label>
-            \<input
-              type="text"
-              id="studentId"
-              required
-              placeholder="e.g. TVM001"
-            \>
-          \</div>
-
-          \<div>
-            \<label>Email \*\</label>
-            \<input
-              type="email"
-              id="studentEmail"
-              required
-              placeholder="student\@gmail.com"
-            \>
-          \</div>
-
-          \<div>
-            \<label>Phone\</label>
-            \<input
-              type="tel"
-              id="studentPhone"
-              placeholder="Phone number"
-            \>
-          \</div>
-
-          \<div>
-            \<label>Class\</label>
-            \<input
-              type="text"
-              id="studentClass"
-              placeholder="e.g. 12"
-            \>
-          \</div>
-
-          \<div>
-            \<label>Initial Login Password \*\</label>
-            \<input
-              type="password"
-              id="studentPassword"
-              minlength="8"
-              required
-              placeholder="Minimum 8 characters"
-            \>
-            \<div class="small">
-              Minimum 8 characters.
-            \</div>
-          \</div>
-
-          \<div>
-            \<label>Status\</label>
-
-            \<select id="studentActive">
-              \<option value="true">Active\</option>
-              \<option value="false">Inactive\</option>
-            \</select>
-          \</div>
-
-        \</div>
-
-        \<div class="form-actions">
-          \<button type="submit" id="addStudentBtn">
-            Add Student
-          \</button>
-        \</div>
-
-        \<div id="studentMessage" class="message">\</div>
-
-      \</form>
-
-    \</div>
-
-
-
-    \<div class="card">
-
-      \<h2>Students List\</h2>
-
-      \<div class="table-wrap">
-
-        \<table>
-
-          \<thead>
-            \<tr>
-              \<th>Name\</th>
-              \<th>Student ID\</th>
-              \<th>Email\</th>
-              \<th>Class\</th>
-              \<th>Status\</th>
-              \<th>Actions\</th>
-            \</tr>
-          \</thead>
-
-          \<tbody id="studentsTable">
-            \<tr>
-              \<td colspan="6">Loading...\</td>
-            \</tr>
-          \</tbody>
-
-        \</table>
-
-      \</div>
-
-    \</div>
-
-  \</section>
-
-
-
-  \<!-- ================= FEES ================= -->
-
-  \<section id="feesSection" class="section">
-
-    \<div class="card">
-
-      \<h2>Add Fee\</h2>
-
-      \<form id="feeForm">
-
-        \<div class="form-grid">
-
-          \<div>
-            \<label>Student \*\</label>
-            \<select id="feeStudent" required>
-              \<option value="">Select student\</option>
-            \</select>
-          \</div>
-
-          \<div>
-            \<label>Month \*\</label>
-            \<input
-              type="text"
-              id="feeMonth"
-              required
-              placeholder="October 2026"
-            \>
-          \</div>
-
-          \<div>
-            \<label>Amount \*\</label>
-            \<input
-              type="number"
-              id="feeAmount"
-              min="0"
-              step="0.01"
-              required
-              placeholder="Amount"
-            \>
-          \</div>
-
-          \<div>
-            \<label>Status \*\</label>
-            \<select id="feeStatus">
-              \<option value="paid">Paid\</option>
-              \<option value="unpaid">Unpaid\</option>
-            \</select>
-          \</div>
-
-          \<div>
-            \<label>Payment Date\</label>
-            \<input type="date" id="feeDate">
-          \</div>
-
-          \<div>
-            \<label>Receipt Number\</label>
-            \<input
-              type="text"
-              id="feeReceipt"
-              placeholder="e.g. TV-2026-001"
-            \>
-          \</div>
-
-        \</div>
-
-        \<div class="form-actions">
-          \<button type="submit">Add Fee\</button>
-        \</div>
-
-        \<div id="feeMessage" class="message">\</div>
-
-      \</form>
-
-    \</div>
-
-
-
-    \<div class="card">
-
-      \<h2>Fee Records\</h2>
-
-      \<div class="table-wrap">
-
-        \<table>
-
-          \<thead>
-            \<tr>
-              \<th>Student\</th>
-              \<th>Month\</th>
-              \<th>Amount\</th>
-              \<th>Status\</th>
-              \<th>Payment Date\</th>
-              \<th>Receipt\</th>
-              \<th>Action\</th>
-            \</tr>
-          \</thead>
-
-          \<tbody id="feesTable">
-            \<tr>
-              \<td colspan="7">Loading...\</td>
-            \</tr>
-          \</tbody>
-
-        \</table>
-
-      \</div>
-
-    \</div>
-
-  \</section>
-
-
-
-  \<!-- ================= RECEIPTS ================= -->
-
-  \<section id="receiptsSection" class="section">
-
-    \<div class="card">
-
-      \<h2>Create Receipt\</h2>
-
-      \<form id="receiptForm">
-
-        \<div class="form-grid">
-
-          \<div>
-            \<label>Student \*\</label>
-            \<select id="receiptStudent" required>
-              \<option value="">Select student\</option>
-            \</select>
-          \</div>
-
-          \<div>
-            \<label>Receipt Number \*\</label>
-            \<input
-              type="text"
-              id="receiptNumber"
-              required
-              placeholder="TV-2026-001"
-            \>
-          \</div>
-
-          \<div>
-            \<label>Month \*\</label>
-            \<input
-              type="text"
-              id="receiptMonth"
-              required
-              placeholder="October 2026"
-            \>
-          \</div>
-
-          \<div>
-            \<label>Amount \*\</label>
-            \<input
-              type="number"
-              id="receiptAmount"
-              min="0"
-              step="0.01"
-              required
-            \>
-          \</div>
-
-          \<div>
-            \<label>Payment Date \*\</label>
-            \<input type="date" id="receiptDate" required>
-          \</div>
-
-          \<div>
-            \<label>Status\</label>
-            \<select id="receiptStatus">
-              \<option value="paid">Paid\</option>
-              \<option value="unpaid">Unpaid\</option>
-            \</select>
-          \</div>
-
-        \</div>
-
-        \<div class="form-actions">
-          \<button type="submit">Create Receipt\</button>
-        \</div>
-
-        \<div id="receiptMessage" class="message">\</div>
-
-      \</form>
-
-    \</div>
-
-
-
-    \<div class="card">
-
-      \<h2>Receipt History\</h2>
-
-      \<div class="table-wrap">
-
-        \<table>
-
-          \<thead>
-            \<tr>
-              \<th>Student\</th>
-              \<th>Receipt No.\</th>
-              \<th>Month\</th>
-              \<th>Amount\</th>
-              \<th>Date\</th>
-              \<th>Status\</th>
-              \<th>Action\</th>
-            \</tr>
-          \</thead>
-
-          \<tbody id="receiptsTable">
-            \<tr>
-              \<td colspan="7">Loading...\</td>
-            \</tr>
-          \</tbody>
-
-        \</table>
-
-      \</div>
-
-    \</div>
-
-  \</section>
-
-
-
-  \<!-- ================= LECTURES ================= -->
-
-  \<section id="lecturesSection" class="section">
-
-    \<div class="card">
-
-      \<h2>Add Lecture / Video\</h2>
-
-      \<form id="lectureForm">
-
-        \<div class="form-grid">
-
-          \<div>
-            \<label>Title \*\</label>
-            \<input
-              type="text"
-              id="lectureTitle"
-              required
-              placeholder="Lecture title"
-            \>
-          \</div>
-
-          \<div>
-            \<label>Video URL \*\</label>
-            \<input
-              type="url"
-              id="lectureUrl"
-              required
-              placeholder="YouTube / Google Drive / video URL"
-            \>
-          \</div>
-
-          \<div class="full">
-            \<label>Description\</label>
-            \<textarea
-              id="lectureDescription"
-              placeholder="Lecture description"
-            \>\</textarea>
-          \</div>
-
-          \<div>
-            \<label>Publication\</label>
-            \<select id="lecturePublished">
-              \<option value="true">Published\</option>
-              \<option value="false">Draft\</option>
-            \</select>
-          \</div>
-
-        \</div>
-
-        \<div class="form-actions">
-          \<button type="submit">Add Lecture\</button>
-        \</div>
-
-        \<div id="lectureMessage" class="message">\</div>
-
-      \</form>
-
-    \</div>
-
-
-
-    \<div class="card">
-
-      \<h2>Lecture Library\</h2>
-
-      \<div class="table-wrap">
-
-        \<table>
-
-          \<thead>
-            \<tr>
-              \<th>Title\</th>
-              \<th>Description\</th>
-              \<th>Status\</th>
-              \<th>Video\</th>
-              \<th>Action\</th>
-            \</tr>
-          \</thead>
-
-          \<tbody id="lecturesTable">
-            \<tr>
-              \<td colspan="5">Loading...\</td>
-            \</tr>
-          \</tbody>
-
-        \</table>
-
-      \</div>
-
-    \</div>
-
-  \</section>
-
-\</div>
-
-
-
-\<script>
-
-  // =========================================================
-  // SUPABASE
-  // =========================================================
-
-  const SUPABASE_URL =
-    "[https://ifehzphaiekcaplckjfl.supabase.co](https://ifehzphaiekcaplckjfl.supabase.co)";
-
-  const SUPABASE_KEY =
-    "sb_publishable_8RwWggD47qMdZfveDF4DIg_Ql29_OoJ";
-  const { createClient } = supabase;
-
-  const db = createClient(
-    SUPABASE_URL,
-    SUPABASE_KEY
-  );
-
-
-
-  // =========================================================
-  // GLOBAL DATA
-  // =========================================================
-
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard | Takshashila Vidhyapeeth</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: Arial, sans-serif; background: #f4f6f8; color: #222; }
+    header { background: #111827; color: white; padding: 18px 24px; display: flex; justify-content: space-between; align-items: center; gap: 15px; }
+    header h1 { margin: 0; font-size: 22px; }
+    header p { margin: 5px 0 0; color: #d1d5db; font-size: 14px; }
+    button { border: 0; border-radius: 8px; padding: 10px 15px; cursor: pointer; font-size: 14px; background: #2563eb; color: white; }
+    button:hover { opacity: 0.9; }
+    button:disabled { opacity: 0.6; cursor: not-allowed; }
+    button.danger { background: #dc2626; }
+    button.secondary { background: #6b7280; }
+    button.success { background: #16a34a; }
+    .container { max-width: 1200px; margin: 25px auto; padding: 0 15px; }
+    .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-bottom: 20px; }
+    .stat { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+    .stat h3 { margin: 0 0 8px; font-size: 14px; color: #6b7280; }
+    .stat strong { font-size: 28px; }
+    .tabs { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 20px; }
+    .tab { background: #e5e7eb; color: #111827; }
+    .tab.active { background: #2563eb; color: white; }
+    .section { display: none; }
+    .section.active { display: block; }
+    .card { background: white; border-radius: 12px; padding: 20px; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+    .card h2 { margin-top: 0; }
+    .form-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; }
+    .full { grid-column: 1 / -1; }
+    label { display: block; font-size: 14px; font-weight: bold; margin-bottom: 6px; }
+    input, select, textarea { width: 100%; padding: 11px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 14px; }
+    textarea { min-height: 90px; resize: vertical; }
+    .form-actions { margin-top: 15px; display: flex; gap: 10px; flex-wrap: wrap; }
+    .message { margin-top: 12px; padding: 10px; border-radius: 8px; display: none; }
+    .message.show { display: block; }
+    .message.success { background: #dcfce7; color: #166534; }
+    .message.error { background: #fee2e2; color: #991b1b; }
+    .table-wrap { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; min-width: 700px; }
+    th, td { text-align: left; padding: 11px; border-bottom: 1px solid #e5e7eb; font-size: 14px; }
+    th { background: #f9fafb; }
+    .badge { display: inline-block; padding: 5px 9px; border-radius: 20px; font-size: 12px; font-weight: bold; }
+    .paid { background: #dcfce7; color: #166534; }
+    .unpaid { background: #fee2e2; color: #991b1b; }
+    .published { background: #dbeafe; color: #1e40af; }
+    .draft { background: #f3f4f6; color: #4b5563; }
+    .small { font-size: 12px; color: #6b7280; margin-top: 5px; }
+    .password-note { background: #eff6ff; color: #1e40af; padding: 10px; border-radius: 8px; font-size: 13px; margin-bottom: 15px; }
+    @media (max-width: 800px) { .stats { grid-template-columns: repeat(2, 1fr); } .form-grid { grid-template-columns: 1fr; } .full { grid-column: auto; } }
+    @media (max-width: 500px) { .stats { grid-template-columns: 1fr; } header { flex-direction: column; align-items: flex-start; } }
+  </style>
+</head>
+<body>
+<header>
+  <div>
+    <h1>Admin Dashboard</h1>
+    <p>Takshashila Vidhyapeeth — Department of Music</p>
+    <p id="adminName">Checking admin...</p>
+  </div>
+  <button id="logoutBtn" class="danger" type="button">Logout</button>
+</header>
+
+<div class="container">
+  <div class="stats">
+    <div class="stat"><h3>Students</h3><strong id="studentCount">0</strong></div>
+    <div class="stat"><h3>Paid Fees</h3><strong id="paidCount">0</strong></div>
+    <div class="stat"><h3>Unpaid Fees</h3><strong id="unpaidCount">0</strong></div>
+    <div class="stat"><h3>Lectures</h3><strong id="lectureCount">0</strong></div>
+  </div>
+
+  <div class="tabs">
+    <button class="tab active" data-tab="studentsSection" type="button">Students</button>
+    <button class="tab" data-tab="feesSection" type="button">Fees</button>
+    <button class="tab" data-tab="receiptsSection" type="button">Receipts</button>
+    <button class="tab" data-tab="lecturesSection" type="button">Lectures</button>
+  </div>
+
+  <section id="studentsSection" class="section active">
+    <div class="card">
+      <h2>Add Student</h2>
+      <div class="password-note">The student's Supabase login account will be created automatically. Give the student the email and initial password entered below. The student can later use Forgot Password.</div>
+      <form id="studentForm">
+        <div class="form-grid">
+          <div><label for="studentName">Full Name *</label><input type="text" id="studentName" required placeholder="Student full name"></div>
+          <div><label for="studentId">Student ID *</label><input type="text" id="studentId" required placeholder="e.g. TVM001"></div>
+          <div><label for="studentEmail">Email *</label><input type="email" id="studentEmail" required placeholder="student@gmail.com"></div>
+          <div><label for="studentPhone">Phone</label><input type="tel" id="studentPhone" placeholder="Phone number"></div>
+          <div><label for="studentClass">Class</label><input type="text" id="studentClass" placeholder="e.g. 12"></div>
+          <div><label for="studentPassword">Initial Login Password *</label><input type="password" id="studentPassword" minlength="8" required placeholder="Minimum 8 characters"><div class="small">Minimum 8 characters.</div></div>
+          <div><label for="studentActive">Status</label><select id="studentActive"><option value="true">Active</option><option value="false">Inactive</option></select></div>
+        </div>
+        <div class="form-actions"><button type="submit" id="addStudentBtn">Add Student</button></div>
+        <div id="studentMessage" class="message"></div>
+      </form>
+    </div>
+    <div class="card">
+      <h2>Students List</h2>
+      <div class="table-wrap"><table>
+        <thead><tr><th>Name</th><th>Student ID</th><th>Email</th><th>Class</th><th>Status</th><th>Actions</th></tr></thead>
+        <tbody id="studentsTable"><tr><td colspan="6">Loading...</td></tr></tbody>
+      </table></div>
+    </div>
+  </section>
+
+  <section id="feesSection" class="section">
+    <div class="card">
+      <h2>Add Fee</h2>
+      <form id="feeForm">
+        <div class="form-grid">
+          <div><label for="feeStudent">Student *</label><select id="feeStudent" required><option value="">Select student</option></select></div>
+          <div><label for="feeMonth">Month *</label><input type="text" id="feeMonth" required placeholder="October 2026"></div>
+          <div><label for="feeAmount">Amount *</label><input type="number" id="feeAmount" min="0" step="0.01" required placeholder="Amount"></div>
+          <div><label for="feeStatus">Status *</label><select id="feeStatus"><option value="paid">Paid</option><option value="unpaid">Unpaid</option></select></div>
+          <div><label for="feeDate">Payment Date</label><input type="date" id="feeDate"></div>
+          <div><label for="feeReceipt">Receipt Number</label><input type="text" id="feeReceipt" placeholder="e.g. TV-2026-001"></div>
+        </div>
+        <div class="form-actions"><button type="submit">Add Fee</button></div>
+        <div id="feeMessage" class="message"></div>
+      </form>
+    </div>
+    <div class="card">
+      <h2>Fee Records</h2>
+      <div class="table-wrap"><table>
+        <thead><tr><th>Student</th><th>Month</th><th>Amount</th><th>Status</th><th>Payment Date</th><th>Receipt</th><th>Action</th></tr></thead>
+        <tbody id="feesTable"><tr><td colspan="7">Loading...</td></tr></tbody>
+      </table></div>
+    </div>
+  </section>
+
+  <section id="receiptsSection" class="section">
+    <div class="card">
+      <h2>Create Receipt</h2>
+      <form id="receiptForm">
+        <div class="form-grid">
+          <div><label for="receiptStudent">Student *</label><select id="receiptStudent" required><option value="">Select student</option></select></div>
+          <div><label for="receiptNumber">Receipt Number *</label><input type="text" id="receiptNumber" required placeholder="TV-2026-001"></div>
+          <div><label for="receiptMonth">Month *</label><input type="text" id="receiptMonth" required placeholder="October 2026"></div>
+          <div><label for="receiptAmount">Amount *</label><input type="number" id="receiptAmount" min="0" step="0.01" required></div>
+          <div><label for="receiptDate">Payment Date *</label><input type="date" id="receiptDate" required></div>
+          <div><label for="receiptStatus">Status</label><select id="receiptStatus"><option value="paid">Paid</option><option value="unpaid">Unpaid</option></select></div>
+        </div>
+        <div class="form-actions"><button type="submit">Create Receipt</button></div>
+        <div id="receiptMessage" class="message"></div>
+      </form>
+    </div>
+    <div class="card">
+      <h2>Receipt History</h2>
+      <div class="table-wrap"><table>
+        <thead><tr><th>Student</th><th>Receipt No.</th><th>Month</th><th>Amount</th><th>Date</th><th>Status</th><th>Action</th></tr></thead>
+        <tbody id="receiptsTable"><tr><td colspan="7">Loading...</td></tr></tbody>
+      </table></div>
+    </div>
+  </section>
+
+  <section id="lecturesSection" class="section">
+    <div class="card">
+      <h2>Add Lecture / Video</h2>
+      <form id="lectureForm">
+        <div class="form-grid">
+          <div><label for="lectureTitle">Title *</label><input type="text" id="lectureTitle" required placeholder="Lecture title"></div>
+          <div><label for="lectureUrl">Video URL *</label><input type="url" id="lectureUrl" required placeholder="YouTube / Google Drive / video URL"></div>
+          <div class="full"><label for="lectureDescription">Description</label><textarea id="lectureDescription" placeholder="Lecture description"></textarea></div>
+          <div><label for="lecturePublished">Publication</label><select id="lecturePublished"><option value="true">Published</option><option value="false">Draft</option></select></div>
+        </div>
+        <div class="form-actions"><button type="submit">Add Lecture</button></div>
+        <div id="lectureMessage" class="message"></div>
+      </form>
+    </div>
+    <div class="card">
+      <h2>Lecture Library</h2>
+      <div class="table-wrap"><table>
+        <thead><tr><th>Title</th><th>Description</th><th>Status</th><th>Video</th><th>Action</th></tr></thead>
+        <tbody id="lecturesTable"><tr><td colspan="5">Loading...</td></tr></tbody>
+      </table></div>
+    </div>
+  </section>
+</div>
+
+<script>
+  "use strict";
+
+  const SUPABASE_URL = "https://ifehzphaiekcaplckjfl.supabase.co";
+  const SUPABASE_KEY = "sb_publishable_8RwWggD47qMdZfveDF4DIg_Ql29_OoJ";
+
+  if (!window.supabase || typeof window.supabase.createClient !== "function") {
+    alert("Supabase library failed to load. Please refresh the page or check your internet connection.");
+    throw new Error("Supabase JavaScript library did not load.");
+  }
+
+  const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
   let currentUser = null;
   let students = [];
   let fees = [];
   let receipts = [];
   let lectures = [];
 
-
-
-  // =========================================================
-  // HELPERS
-  // =========================================================
-
   function escapeHtml(value) {
-
-    if (value === null || value === undefined) {
-      return "";
-    }
-
-    return String(value)
-      .replaceAll("&", "&amp;")
-      .replaceAll("<", "&lt;")
-      .replaceAll(">", "&gt;")
-      .replaceAll('"', "&quot;")
-      .replaceAll("'", "&#039;");
+    if (value === null || value === undefined) return "";
+    return String(value).replaceAll("&", "&amp;").replaceAll("<", "&lt;")
+      .replaceAll(">", "&gt;").replaceAll('"', "&quot;").replaceAll("'", "&#039;");
   }
 
-
-
-  function showMessage(
-    elementId,
-    message,
-    type = "success"
-  ) {
-
-    const element =
-      document.getElementById(elementId);
-
+  function showMessage(elementId, message, type = "success") {
+    const element = document.getElementById(elementId);
+    if (!element) return;
     element.textContent = message;
-
-    element.className =
-      "message show " + type;
-
-    setTimeout(() => {
-      element.className = "message";
-    }, 6000);
+    element.className = "message show " + type;
+    window.setTimeout(() => { element.className = "message"; }, 6000);
   }
-
-
 
   function formatAmount(amount) {
-
-    const number = Number(amount || 0);
-
-    return "₹" + number.toLocaleString("en-IN", {
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 2
+    return "₹" + Number(amount || 0).toLocaleString("en-IN", {
+      minimumFractionDigits: 0, maximumFractionDigits: 2
     });
   }
 
-
-
-  // =========================================================
-  // ADMIN CHECK
-  // =========================================================
-
   async function checkAdmin() {
-
-    const {
-      data: {
-        session
-      }
-    } = await db.auth.getSession();
-
+    const { data: { session }, error: sessionError } = await db.auth.getSession();
+    if (sessionError) {
+      console.error("Session check failed:", sessionError);
+      window.location.replace("login.html");
+      return false;
+    }
     if (!session) {
-      window.location.href = "login.html";
+      window.location.replace("login.html");
       return false;
     }
 
     currentUser = session.user;
+    const { data: profile, error } = await db.from("profiles")
+      .select("role, full_name").eq("id", currentUser.id).single();
 
-    const {
-      data: profile,
-      error
-    } = await db
-      .from("profiles")
-      .select("role, full_name")
-      .eq("id", currentUser.id)
-      .single();
-
-    if (error) {
-
-      console.error(error);
-
-      alert(
-        "Could not load admin profile."
-      );
-
+    if (error || !profile) {
+      console.error("Admin profile error:", error);
+      alert("Could not load admin profile. Please check the profiles table and admin role.");
       await db.auth.signOut();
-
-      window\.location.href = "login.html";
-
+      window.location.replace("login.html");
       return false;
     }
 
     if (profile.role !== "admin") {
-
-      alert(
-        "Admin access required."
-      );
-
+      alert("Admin access required.");
       await db.auth.signOut();
-
-      window\.location.href = "login.html";
-
+      window.location.replace("login.html");
       return false;
     }
 
-    document.getElementById(
-      "adminName"
-    ).textContent =
-      "Logged in as: " +
-      (profile.full_name || currentUser.email);
-
+    document.getElementById("adminName").textContent =
+      "Logged in as: " + (profile.full_name || currentUser.email || "Admin");
     return true;
   }
 
+  document.getElementById("logoutBtn").addEventListener("click", async () => {
+    const button = document.getElementById("logoutBtn");
+    button.disabled = true;
+    button.textContent = "Logging out...";
+    try {
+      const { error } = await db.auth.signOut();
+      if (error) console.error("Sign out error:", error);
+    } finally {
+      window.location.replace("login.html");
+    }
+  });
 
-
-  // =========================================================
-  // LOGOUT
-  // =========================================================
-
-  document
-    .getElementById("logoutBtn")
-    .addEventListener("click", async () => {
-
-      await db.auth.signOut();
-
-      window\.location.href =
-        "login.html";
-
+  document.querySelectorAll(".tab").forEach(button => {
+    button.addEventListener("click", () => {
+      document.querySelectorAll(".tab").forEach(tab => tab.classList.remove("active"));
+      document.querySelectorAll(".section").forEach(section => section.classList.remove("active"));
+      button.classList.add("active");
+      const target = document.getElementById(button.dataset.tab);
+      if (target) target.classList.add("active");
     });
-
-
-
-  // =========================================================
-  // TABS
-  // =========================================================
-
-  document
-    .querySelectorAll(".tab")
-    .forEach(button => {
-
-      button.addEventListener(
-        "click",
-        () => {
-
-          document
-            .querySelectorAll(".tab")
-            .forEach(btn =>
-              btn.classList.remove("active")
-            );
-
-          document
-            .querySelectorAll(".section")
-            .forEach(section =>
-              section.classList.remove("active")
-            );
-
-          button.classList.add("active");
-
-          document
-            .getElementById(
-              button.dataset.tab
-            )
-            .classList.add("active");
-
-        }
-      );
-
-    });
-
-
-
-  // =========================================================
-  // LOAD STUDENTS
-  // =========================================================
+  });
 
   async function loadStudents() {
-
-    const {
-      data,
-      error
-    } = await db
-      .from("students")
-      .select("\*")
-      .order("created_at", {
-        ascending: false
-      });
-
+    const { data, error } = await db.from("students").select("*").order("created_at", { ascending: false });
     if (error) {
-
-      console.error(
-        "Students:",
-        error
-      );
-
-      document.getElementById(
-        "studentsTable"
-      ).innerHTML =
-        \`\<tr>
-          \<td colspan="6">
-            ${escapeHtml(error.message)}
-          \</td>
-        \</tr>\`;
-
+      console.error("Students:", error);
+      document.getElementById("studentsTable").innerHTML =
+        `<tr><td colspan="6">${escapeHtml(error.message)}</td></tr>`;
       return;
     }
-
     students = data || [];
-
     renderStudents();
-
     updateStudentDropdowns();
-
-    document.getElementById(
-      "studentCount"
-    ).textContent =
-      students.length;
+    document.getElementById("studentCount").textContent = students.length;
   }
-
-
 
   function renderStudents() {
-
-    const table =
-      document.getElementById(
-        "studentsTable"
-      );
-
+    const table = document.getElementById("studentsTable");
     if (!students.length) {
-
-      table.innerHTML =
-        \`\<tr>
-          \<td colspan="6">
-            No students found.
-          \</td>
-        \</tr>\`;
-
+      table.innerHTML = `<tr><td colspan="6">No students found.</td></tr>`;
       return;
     }
-
-    table.innerHTML =
-      students.map(student => {
-
-        const status =
-          student.active
-            ? \`\<span class="badge paid">Active\</span>\`
-            : \`\<span class="badge unpaid">Inactive\</span>\`;
-
-        return \`
-          \<tr>
-
-            \<td>
-              ${escapeHtml(student.full_name)}
-            \</td>
-
-            \<td>
-              ${escapeHtml(student.student_id)}
-            \</td>
-
-            \<td>
-              ${escapeHtml(student.email)}
-            \</td>
-
-            \<td>
-              ${escapeHtml(student.class_name || "-")}
-            \</td>
-
-            \<td>
-              ${status}
-            \</td>
-
-            \<td>
-
-              \<button
-                class="secondary"
-                onclick="toggleStudent('${student.id}', ${student.active})"
-              \>
-                ${student.active ? "Deactivate" : "Activate"}
-              \</button>
-
-              \<button
-                class="danger"
-                onclick="deleteStudent('${student.id}')"
-              \>
-                Delete
-              \</button>
-
-            \</td>
-
-          \</tr>
-        \`;
-
-      }).join("");
+    table.innerHTML = students.map(student => {
+      const status = student.active
+        ? `<span class="badge paid">Active</span>`
+        : `<span class="badge unpaid">Inactive</span>`;
+      return `<tr>
+        <td>${escapeHtml(student.full_name)}</td>
+        <td>${escapeHtml(student.student_id)}</td>
+        <td>${escapeHtml(student.email)}</td>
+        <td>${escapeHtml(student.class_name || "-")}</td>
+        <td>${status}</td>
+        <td>
+          <button class="secondary" type="button" onclick="toggleStudent('${escapeHtml(student.id)}', ${Boolean(student.active)})">${student.active ? "Deactivate" : "Activate"}</button>
+          <button class="danger" type="button" onclick="deleteStudent('${escapeHtml(student.id)}')">Delete</button>
+        </td>
+      </tr>`;
+    }).join("");
   }
-
-
 
   function updateStudentDropdowns() {
-
-    const feeSelect =
-      document.getElementById(
-        "feeStudent"
-      );
-
-    const receiptSelect =
-      document.getElementById(
-        "receiptStudent"
-      );
-
-    const options =
-      students
-        .filter(student => student.user_id)
-        .map(student =>
-          \`\<option value="${escapeHtml(student.user_id)}">
-            ${escapeHtml(student.full_name)}
-            — ${escapeHtml(student.student_id)}
-          \</option>\`
-        )
-        .join("");
-
-    feeSelect.innerHTML =
-      \`\<option value="">Select student\</option>\` +
-      options;
-
-    receiptSelect.innerHTML =
-      \`\<option value="">Select student\</option>\` +
-      options;
+    const options = students.filter(student => student.user_id).map(student =>
+      `<option value="${escapeHtml(student.user_id)}">${escapeHtml(student.full_name)} — ${escapeHtml(student.student_id)}</option>`
+    ).join("");
+    document.getElementById("feeStudent").innerHTML = `<option value="">Select student</option>` + options;
+    document.getElementById("receiptStudent").innerHTML = `<option value="">Select student</option>` + options;
   }
 
-
-
-  // =========================================================
-  // ADD STUDENT
-  // =========================================================
-
-  document
-    .getElementById("studentForm")
-    .addEventListener(
-      "submit",
-      async function(event) {
-
-        event.preventDefault();
-
-        const button =
-          document.getElementById(
-            "addStudentBtn"
-          );
-
-        button.disabled = true;
-        button.textContent =
-          "Creating student...";
-
-        try {
-
-          const {
-            data: {
-              session
-            }
-          } = await db.auth.getSession();
-
-          if (!session) {
-
-            throw new Error(
-              "Your admin session has expired. Please login again."
-            );
-          }
-
-
-
-          const payload = {
-
-            full_name:
-              document
-                .getElementById("studentName")
-                .value
-                .trim(),
-
-            student_id:
-              document
-                .getElementById("studentId")
-                .value
-                .trim(),
-
-            email:
-              document
-                .getElementById("studentEmail")
-                .value
-                .trim(),
-
-            phone:
-              document
-                .getElementById("studentPhone")
-                .value
-                .trim(),
-
-            class_name:
-              document
-                .getElementById("studentClass")
-                .value
-                .trim(),
-
-            password:
-              document
-                .getElementById("studentPassword")
-                .value,
-
-            active:
-              document
-                .getElementById("studentActive")
-                .value === "true"
-
-          };
-
-
-
-          const response =
-            await fetch(
-              SUPABASE_URL +
-              "/functions/v1/create-student",
-              {
-
-                method: "POST",
-
-                headers: {
-
-                  "Content-Type":
-                    "application/json",
-
-                  "Authorization":
-                    "Bearer " +
-                    session.access_token,
-
-                  "apikey":
-                    SUPABASE_KEY
-
-                },
-
-                body:
-                  JSON.stringify(payload)
-
-              }
-            );
-
-
-
-          const result =
-            await response.json();
-
-
-
-          if (!response.ok) {
-
-            throw new Error(
-              result.error ||
-              "Student creation failed."
-            );
-
-          }
-
-
-
-          showMessage(
-            "studentMessage",
-            "Student created successfully. Login account is connected.",
-            "success"
-          );
-
-
-
-          document
-            .getElementById(
-              "studentForm"
-            )
-            .reset();
-
-
-
-          await loadStudents();
-
-
-
-        } catch (error) {
-
-          console.error(
-            "Add student error:",
-            error
-          );
-
-          showMessage(
-            "studentMessage",
-            error.message,
-            "error"
-          );
-
-        } finally {
-
-          button.disabled = false;
-
-          button.textContent =
-            "Add Student";
-
-        }
-
-      }
-    );
-
-
-
-  // =========================================================
-  // ACTIVATE / DEACTIVATE STUDENT
-  // =========================================================
-
-  async function toggleStudent(
-    id,
-    currentStatus
-  ) {
-
-    const {
-      error
-    } = await db
-      .from("students")
-      .update({
-        active: !currentStatus
-      })
-      .eq("id", id);
-
-    if (error) {
-
-      alert(
-        "Could not update student: " +
-        error.message
-      );
-
-      return;
-    }
-
-    await loadStudents();
-  }
-
-
-
-  // =========================================================
-  // DELETE STUDENT RECORD
-  // =========================================================
-
-  async function deleteStudent(id) {
-
-    const student =
-      students.find(
-        item => item.id === id
-      );
-
-    if (!student) return;
-
-    const confirmed =
-      confirm(
-        \`Delete student record for ${student.full_name}?\`
-      );
-
-    if (!confirmed) return;
-
-
-
-    const {
-      error
-    } = await db
-      .from("students")
-      .delete()
-      .eq("id", id);
-
-    if (error) {
-
-      alert(
-        "Could not delete student: " +
-        error.message
-      );
-
-      return;
-    }
-
-    await loadStudents();
-  }
-
-
-
-  // =========================================================
-  // ADD FEE
-  // =========================================================
-
-  document
-    .getElementById("feeForm")
-    .addEventListener(
-      "submit",
-      async event => {
-
-        event.preventDefault();
-
-        const {
-          error
-        } = await db
-          .from("fees")
-          .insert({
-
-            student_id:
-              document
-                .getElementById("feeStudent")
-                .value,
-
-            month:
-              document
-                .getElementById("feeMonth")
-                .value
-                .trim(),
-
-            amount:
-              Number(
-                document
-                  .getElementById("feeAmount")
-                  .value
-              ),
-
-            status:
-              document
-                .getElementById("feeStatus")
-                .value,
-
-            payment_date:
-              document
-                .getElementById("feeDate")
-                .value ||
-              null,
-
-            receipt_number:
-              document
-                .getElementById("feeReceipt")
-                .value
-                .trim() ||
-              null
-
-          });
-
-
-
-        if (error) {
-
-          console.error(error);
-
-          showMessage(
-            "feeMessage",
-            error.message,
-            "error"
-          );
-
-          return;
-        }
-
-
-
-        showMessage(
-          "feeMessage",
-          "Fee added successfully.",
-          "success"
-        );
-
-
-
-        document
-          .getElementById(
-            "feeForm"
-          )
-          .reset();
-
-
-
-        await loadFees();
-
-      }
-    );
-
-
-
-  // =========================================================
-  // LOAD FEES
-  // =========================================================
-
-  async function loadFees() {
-
-    const {
-      data,
-      error
-    } = await db
-      .from("fees")
-      .select("\*")
-      .order("id", {
-        ascending: false
+  document.getElementById("studentForm").addEventListener("submit", async event => {
+    event.preventDefault();
+    const button = document.getElementById("addStudentBtn");
+    button.disabled = true;
+    button.textContent = "Creating student...";
+    try {
+      const { data: { session } } = await db.auth.getSession();
+      if (!session) throw new Error("Your admin session has expired. Please log in again.");
+
+      const payload = {
+        full_name: document.getElementById("studentName").value.trim(),
+        student_id: document.getElementById("studentId").value.trim(),
+        email: document.getElementById("studentEmail").value.trim(),
+        phone: document.getElementById("studentPhone").value.trim(),
+        class_name: document.getElementById("studentClass").value.trim(),
+        password: document.getElementById("studentPassword").value,
+        active: document.getElementById("studentActive").value === "true"
+      };
+
+      const response = await fetch(SUPABASE_URL + "/functions/v1/create-student", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer " + session.access_token,
+          "apikey": SUPABASE_KEY
+        },
+        body: JSON.stringify(payload)
       });
 
-    if (error) {
-
-      console.error(
-        "Fees:",
-        error
-      );
-
-      return;
+      let result = {};
+      try { result = await response.json(); } catch (_) {}
+      if (!response.ok) throw new Error(result.error || "Student creation failed.");
+      showMessage("studentMessage", "Student created successfully. Login account is connected.", "success");
+      document.getElementById("studentForm").reset();
+      await loadStudents();
+    } catch (error) {
+      console.error("Add student error:", error);
+      showMessage("studentMessage", error.message || "Student creation failed.", "error");
+    } finally {
+      button.disabled = false;
+      button.textContent = "Add Student";
     }
+  });
 
+  async function toggleStudent(id, currentStatus) {
+    const { error } = await db.from("students").update({ active: !currentStatus }).eq("id", id);
+    if (error) { alert("Could not update student: " + error.message); return; }
+    await loadStudents();
+  }
+
+  async function deleteStudent(id) {
+    const student = students.find(item => item.id === id);
+    if (!student) return;
+    if (!confirm(`Delete student record for ${student.full_name}? This only deletes the student record, not necessarily their login account.`)) return;
+    const { error } = await db.from("students").delete().eq("id", id);
+    if (error) { alert("Could not delete student: " + error.message); return; }
+    await loadStudents();
+  }
+
+  document.getElementById("feeForm").addEventListener("submit", async event => {
+    event.preventDefault();
+    const { error } = await db.from("fees").insert({
+      student_id: document.getElementById("feeStudent").value,
+      month: document.getElementById("feeMonth").value.trim(),
+      amount: Number(document.getElementById("feeAmount").value),
+      status: document.getElementById("feeStatus").value,
+      payment_date: document.getElementById("feeDate").value || null,
+      receipt_number: document.getElementById("feeReceipt").value.trim() || null
+    });
+    if (error) { console.error(error); showMessage("feeMessage", error.message, "error"); return; }
+    showMessage("feeMessage", "Fee added successfully.", "success");
+    document.getElementById("feeForm").reset();
+    await loadFees();
+  });
+
+  async function loadFees() {
+    const { data, error } = await db.from("fees").select("*").order("id", { ascending: false });
+    if (error) { console.error("Fees:", error); document.getElementById("feesTable").innerHTML = `<tr><td colspan="7">${escapeHtml(error.message)}</td></tr>`; return; }
     fees = data || [];
-
     renderFees();
-
-    const paid =
-      fees.filter(
-        fee => fee.status === "paid"
-      ).length;
-
-    const unpaid =
-      fees.filter(
-        fee => fee.status === "unpaid"
-      ).length;
-
-    document.getElementById(
-      "paidCount"
-    ).textContent = paid;
-
-    document.getElementById(
-      "unpaidCount"
-    ).textContent = unpaid;
+    document.getElementById("paidCount").textContent = fees.filter(fee => fee.status === "paid").length;
+    document.getElementById("unpaidCount").textContent = fees.filter(fee => fee.status === "unpaid").length;
   }
 
-
-
-  function getStudentName(
-    userId
-  ) {
-
-    const student =
-      students.find(
-        item =>
-          item.user_id === userId
-      );
-
-    if (!student) {
-      return "Unknown student";
-    }
-
-    return (
-      student.full_name +
-      " (" +
-      student.student_id +
-      ")"
-    );
+  function getStudentName(userId) {
+    const student = students.find(item => item.user_id === userId);
+    return student ? `${student.full_name} (${student.student_id})` : "Unknown student";
   }
-
-
 
   function renderFees() {
-
-    const table =
-      document.getElementById(
-        "feesTable"
-      );
-
-    if (!fees.length) {
-
-      table.innerHTML =
-        \`\<tr>
-          \<td colspan="7">
-            No fee records found.
-          \</td>
-        \</tr>\`;
-
-      return;
-    }
-
-
-
-    table.innerHTML =
-      fees.map(fee => {
-
-        const status =
-          fee.status === "paid"
-            ? \`\<span class="badge paid">Paid\</span>\`
-            : \`\<span class="badge unpaid">Unpaid\</span>\`;
-
-        return \`
-          \<tr>
-
-            \<td>
-              ${escapeHtml(
-                getStudentName(
-                  fee.student_id
-                )
-              )}
-            \</td>
-
-            \<td>
-              ${escapeHtml(fee.month)}
-            \</td>
-
-            \<td>
-              ${formatAmount(fee.amount)}
-            \</td>
-
-            \<td>
-              ${status}
-            \</td>
-
-            \<td>
-              ${escapeHtml(
-                fee.payment_date || "-"
-              )}
-            \</td>
-
-            \<td>
-              ${escapeHtml(
-                fee.receipt_number || "-"
-              )}
-            \</td>
-
-            \<td>
-
-              \<button
-                class="secondary"
-                onclick="toggleFee('${fee.id}', '${fee.status}')"
-              \>
-                Toggle
-              \</button>
-
-            \</td>
-
-          \</tr>
-        \`;
-
-      }).join("");
+    const table = document.getElementById("feesTable");
+    if (!fees.length) { table.innerHTML = `<tr><td colspan="7">No fee records found.</td></tr>`; return; }
+    table.innerHTML = fees.map(fee => {
+      const status = fee.status === "paid" ? `<span class="badge paid">Paid</span>` : `<span class="badge unpaid">Unpaid</span>`;
+      return `<tr>
+        <td>${escapeHtml(getStudentName(fee.student_id))}</td>
+        <td>${escapeHtml(fee.month)}</td>
+        <td>${formatAmount(fee.amount)}</td>
+        <td>${status}</td>
+        <td>${escapeHtml(fee.payment_date || "-")}</td>
+        <td>${escapeHtml(fee.receipt_number || "-")}</td>
+        <td><button class="secondary" type="button" onclick="toggleFee('${escapeHtml(fee.id)}', '${escapeHtml(fee.status)}')">Toggle</button></td>
+      </tr>`;
+    }).join("");
   }
 
-
-
-  async function toggleFee(
-    id,
-    status
-  ) {
-
-    const newStatus =
-      status === "paid"
-        ? "unpaid"
-        : "paid";
-
-
-
-    const {
-      error
-    } = await db
-      .from("fees")
-      .update({
-        status: newStatus
-      })
-      .eq("id", id);
-
-
-
-    if (error) {
-
-      alert(
-        "Could not update fee: " +
-        error.message
-      );
-
-      return;
-    }
-
-
-
+  async function toggleFee(id, status) {
+    const newStatus = status === "paid" ? "unpaid" : "paid";
+    const { error } = await db.from("fees").update({ status: newStatus }).eq("id", id);
+    if (error) { alert("Could not update fee: " + error.message); return; }
     await loadFees();
   }
 
-
-
-  // =========================================================
-  // CREATE RECEIPT
-  // =========================================================
-
-  document
-    .getElementById("receiptForm")
-    .addEventListener(
-      "submit",
-      async event => {
-
-        event.preventDefault();
-
-
-
-        const {
-          error
-        } = await db
-          .from("receipts")
-          .insert({
-
-            student_id:
-              document
-                .getElementById(
-                  "receiptStudent"
-                )
-                .value,
-
-            receipt_number:
-              document
-                .getElementById(
-                  "receiptNumber"
-                )
-                .value
-                .trim(),
-
-            month:
-              document
-                .getElementById(
-                  "receiptMonth"
-                )
-                .value
-                .trim(),
-
-            amount:
-              Number(
-                document
-                  .getElementById(
-                    "receiptAmount"
-                  )
-                  .value
-              ),
-
-            payment_date:
-              document
-                .getElementById(
-                  "receiptDate"
-                )
-                .value,
-
-            status:
-              document
-                .getElementById(
-                  "receiptStatus"
-                )
-                .value
-
-          });
-
-
-
-        if (error) {
-
-          console.error(error);
-
-          showMessage(
-            "receiptMessage",
-            error.message,
-            "error"
-          );
-
-          return;
-        }
-
-
-
-        showMessage(
-          "receiptMessage",
-          "Receipt created successfully.",
-          "success"
-        );
-
-
-
-        document
-          .getElementById(
-            "receiptForm"
-          )
-          .reset();
-
-
-
-        await loadReceipts();
-
-      }
-    );
-
-
-
-  // =========================================================
-  // LOAD RECEIPTS
-  // =========================================================
+  document.getElementById("receiptForm").addEventListener("submit", async event => {
+    event.preventDefault();
+    const { error } = await db.from("receipts").insert({
+      student_id: document.getElementById("receiptStudent").value,
+      receipt_number: document.getElementById("receiptNumber").value.trim(),
+      month: document.getElementById("receiptMonth").value.trim(),
+      amount: Number(document.getElementById("receiptAmount").value),
+      payment_date: document.getElementById("receiptDate").value,
+      status: document.getElementById("receiptStatus").value
+    });
+    if (error) { console.error(error); showMessage("receiptMessage", error.message, "error"); return; }
+    showMessage("receiptMessage", "Receipt created successfully.", "success");
+    document.getElementById("receiptForm").reset();
+    await loadReceipts();
+  });
 
   async function loadReceipts() {
-
-    const {
-      data,
-      error
-    } = await db
-      .from("receipts")
-      .select("\*")
-      .order("id", {
-        ascending: false
-      });
-
-
-
-    if (error) {
-
-      console.error(
-        "Receipts:",
-        error
-      );
-
-      return;
-    }
-
-
-
+    const { data, error } = await db.from("receipts").select("*").order("id", { ascending: false });
+    if (error) { console.error("Receipts:", error); document.getElementById("receiptsTable").innerHTML = `<tr><td colspan="7">${escapeHtml(error.message)}</td></tr>`; return; }
     receipts = data || [];
-
     renderReceipts();
   }
 
-
-
   function renderReceipts() {
-
-    const table =
-      document.getElementById(
-        "receiptsTable"
-      );
-
-
-
-    if (!receipts.length) {
-
-      table.innerHTML =
-        \`\<tr>
-          \<td colspan="7">
-            No receipts found.
-          \</td>
-        \</tr>\`;
-
-      return;
-    }
-
-
-
-    table.innerHTML =
-      receipts.map(receipt => {
-
-        const status =
-          receipt.status === "paid"
-            ? \`\<span class="badge paid">Paid\</span>\`
-            : \`\<span class="badge unpaid">Unpaid\</span>\`;
-
-
-
-        return \`
-          \<tr>
-
-            \<td>
-              ${escapeHtml(
-                getStudentName(
-                  receipt.student_id
-                )
-              )}
-            \</td>
-
-            \<td>
-              ${escapeHtml(
-                receipt.receipt_number
-              )}
-            \</td>
-
-            \<td>
-              ${escapeHtml(
-                receipt.month
-              )}
-            \</td>
-
-            \<td>
-              ${formatAmount(
-                receipt.amount
-              )}
-            \</td>
-
-            \<td>
-              ${escapeHtml(
-                receipt.payment_date || "-"
-              )}
-            \</td>
-
-            \<td>
-              ${status}
-            \</td>
-
-            \<td>
-
-              \<button
-                class="danger"
-                onclick="deleteReceipt('${receipt.id}')"
-              \>
-                Delete
-              \</button>
-
-            \</td>
-
-          \</tr>
-        \`;
-
-      }).join("");
+    const table = document.getElementById("receiptsTable");
+    if (!receipts.length) { table.innerHTML = `<tr><td colspan="7">No receipts found.</td></tr>`; return; }
+    table.innerHTML = receipts.map(receipt => {
+      const status = receipt.status === "paid" ? `<span class="badge paid">Paid</span>` : `<span class="badge unpaid">Unpaid</span>`;
+      return `<tr>
+        <td>${escapeHtml(getStudentName(receipt.student_id))}</td>
+        <td>${escapeHtml(receipt.receipt_number)}</td>
+        <td>${escapeHtml(receipt.month)}</td>
+        <td>${formatAmount(receipt.amount)}</td>
+        <td>${escapeHtml(receipt.payment_date || "-")}</td>
+        <td>${status}</td>
+        <td><button class="danger" type="button" onclick="deleteReceipt('${escapeHtml(receipt.id)}')">Delete</button></td>
+      </tr>`;
+    }).join("");
   }
-
-
 
   async function deleteReceipt(id) {
-
-    if (
-      !confirm(
-        "Delete this receipt?"
-      )
-    ) {
-      return;
-    }
-
-
-
-    const {
-      error
-    } = await db
-      .from("receipts")
-      .delete()
-      .eq("id", id);
-
-
-
-    if (error) {
-
-      alert(
-        "Could not delete receipt: " +
-        error.message
-      );
-
-      return;
-    }
-
-
-
+    if (!confirm("Delete this receipt?")) return;
+    const { error } = await db.from("receipts").delete().eq("id", id);
+    if (error) { alert("Could not delete receipt: " + error.message); return; }
     await loadReceipts();
   }
 
-
-
-  // =========================================================
-  // ADD LECTURE
-  // =========================================================
-
-  document
-    .getElementById("lectureForm")
-    .addEventListener(
-      "submit",
-      async event => {
-
-        event.preventDefault();
-
-
-
-        const {
-          error
-        } = await db
-          .from("lectures")
-          .insert({
-
-            title:
-              document
-                .getElementById(
-                  "lectureTitle"
-                )
-                .value
-                .trim(),
-
-            description:
-              document
-                .getElementById(
-                  "lectureDescription"
-                )
-                .value
-                .trim(),
-
-            video_url:
-              document
-                .getElementById(
-                  "lectureUrl"
-                )
-                .value
-                .trim(),
-
-            published:
-              document
-                .getElementById(
-                  "lecturePublished"
-                )
-                .value === "true"
-
-          });
-
-
-
-        if (error) {
-
-          console.error(error);
-
-          showMessage(
-            "lectureMessage",
-            error.message,
-            "error"
-          );
-
-          return;
-        }
-
-
-
-        showMessage(
-          "lectureMessage",
-          "Lecture added successfully.",
-          "success"
-        );
-
-
-
-        document
-          .getElementById(
-            "lectureForm"
-          )
-          .reset();
-
-
-
-        await loadLectures();
-
-      }
-    );
-
-
-
-  // =========================================================
-  // LOAD LECTURES
-  // =========================================================
+  document.getElementById("lectureForm").addEventListener("submit", async event => {
+    event.preventDefault();
+    const { error } = await db.from("lectures").insert({
+      title: document.getElementById("lectureTitle").value.trim(),
+      description: document.getElementById("lectureDescription").value.trim(),
+      video_url: document.getElementById("lectureUrl").value.trim(),
+      published: document.getElementById("lecturePublished").value === "true"
+    });
+    if (error) { console.error(error); showMessage("lectureMessage", error.message, "error"); return; }
+    showMessage("lectureMessage", "Lecture added successfully.", "success");
+    document.getElementById("lectureForm").reset();
+    await loadLectures();
+  });
 
   async function loadLectures() {
-
-    const {
-      data,
-      error
-    } = await db
-      .from("lectures")
-      .select("\*")
-      .order("created_at", {
-        ascending: false
-      });
-
-
-
-    if (error) {
-
-      console.error(
-        "Lectures:",
-        error
-      );
-
-      return;
-    }
-
-
-
+    const { data, error } = await db.from("lectures").select("*").order("created_at", { ascending: false });
+    if (error) { console.error("Lectures:", error); document.getElementById("lecturesTable").innerHTML = `<tr><td colspan="5">${escapeHtml(error.message)}</td></tr>`; return; }
     lectures = data || [];
-
     renderLectures();
-
-
-
-    document.getElementById(
-      "lectureCount"
-    ).textContent =
-      lectures.length;
+    document.getElementById("lectureCount").textContent = lectures.length;
   }
-
-
 
   function renderLectures() {
-
-    const table =
-      document.getElementById(
-        "lecturesTable"
-      );
-
-
-
-    if (!lectures.length) {
-
-      table.innerHTML =
-        \`\<tr>
-          \<td colspan="5">
-            No lectures found.
-          \</td>
-        \</tr>\`;
-
-      return;
-    }
-
-
-
-    table.innerHTML =
-      lectures.map(lecture => {
-
-        const status =
-          lecture.published
-            ? \`\<span class="badge published">Published\</span>\`
-            : \`\<span class="badge draft">Draft\</span>\`;
-
-
-
-        return \`
-          \<tr>
-
-            \<td>
-              ${escapeHtml(
-                lecture.title
-              )}
-            \</td>
-
-            \<td>
-              ${escapeHtml(
-                lecture.description || "-"
-              )}
-            \</td>
-
-            \<td>
-              ${status}
-            \</td>
-
-            \<td>
-
-              \<a
-                href="${escapeHtml(
-                  lecture.video_url
-                )}"
-                target="\_blank"
-                rel="noopener noreferrer"
-              \>
-                Open Video
-              \</a>
-
-            \</td>
-
-            \<td>
-
-              \<button
-                class="secondary"
-                onclick="toggleLecture('${lecture.id}', ${lecture.published})"
-              \>
-                ${lecture.published
-                  ? "Unpublish"
-                  : "Publish"}
-              \</button>
-
-            \</td>
-
-          \</tr>
-        \`;
-
-      }).join("");
+    const table = document.getElementById("lecturesTable");
+    if (!lectures.length) { table.innerHTML = `<tr><td colspan="5">No lectures found.</td></tr>`; return; }
+    table.innerHTML = lectures.map(lecture => {
+      const status = lecture.published ? `<span class="badge published">Published</span>` : `<span class="badge draft">Draft</span>`;
+      return `<tr>
+        <td>${escapeHtml(lecture.title)}</td>
+        <td>${escapeHtml(lecture.description || "-")}</td>
+        <td>${status}</td>
+        <td><a href="${escapeHtml(lecture.video_url)}" target="_blank" rel="noopener noreferrer">Open Video</a></td>
+        <td><button class="secondary" type="button" onclick="toggleLecture('${escapeHtml(lecture.id)}', ${Boolean(lecture.published)})">${lecture.published ? "Unpublish" : "Publish"}</button></td>
+      </tr>`;
+    }).join("");
   }
 
-
-
-  async function toggleLecture(
-    id,
-    published
-  ) {
-
-    const {
-      error
-    } = await db
-      .from("lectures")
-      .update({
-        published: !published
-      })
-      .eq("id", id);
-
-
-
-    if (error) {
-
-      alert(
-        "Could not update lecture: " +
-        error.message
-      );
-
-      return;
-    }
-
-
-
+  async function toggleLecture(id, published) {
+    const { error } = await db.from("lectures").update({ published: !published }).eq("id", id);
+    if (error) { alert("Could not update lecture: " + error.message); return; }
     await loadLectures();
   }
-
-
-
-  // =========================================================
-  // INITIALIZE
-  // =========================================================
 
   async function initialize() {
-
-    const isAdmin =
-      await checkAdmin();
-
-    if (!isAdmin) return;
-
-
-
-    await loadStudents();
-
-    await loadFees();
-
-    await loadReceipts();
-
-    await loadLectures();
+    try {
+      const isAdmin = await checkAdmin();
+      if (!isAdmin) return;
+      await loadStudents();
+      await loadFees();
+      await loadReceipts();
+      await loadLectures();
+    } catch (error) {
+      console.error("Dashboard initialization failed:", error);
+      alert("Dashboard failed to load. Open Console and check the error message.");
+    }
   }
 
-
-
   initialize();
-
-\</script>
-
-\</body>
-\</html>
+</script>
+</body>
+</html>
