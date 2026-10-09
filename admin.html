@@ -2330,6 +2330,104 @@
 
 
   initialize();
+  
+async function loadGallery() {
+  const list = document.getElementById("galleryList");
+
+  if (!list) return;
+
+  list.textContent = "Loading photos...";
+
+  const { data, error } = await db
+    .from("gallery")
+    .select("*")
+    .order("created_at", { ascending: false });
+
+  if (error) {
+    console.error("Gallery:", error);
+    list.textContent = "Could not load gallery: " + error.message;
+    return;
+  }
+
+  if (!data || data.length === 0) {
+    list.textContent = "No photos uploaded yet.";
+    return;
+  }
+
+  list.innerHTML = data.map(photo => `
+    <div style="display:inline-block;vertical-align:top;width:220px;margin:10px;padding:10px;border:1px solid #ddd;border-radius:8px;">
+      <img
+        src="${escapeHtml(photo.image_url)}"
+        alt="${escapeHtml(photo.title)}"
+        style="width:100%;height:150px;object-fit:cover;border-radius:6px;"
+      >
+      <h3>${escapeHtml(photo.title)}</h3>
+      <p>${escapeHtml(photo.description || "")}</p>
+    </div>
+  `).join("");
+}
+
+
+const galleryForm = document.getElementById("galleryForm");
+
+if (galleryForm) {
+  galleryForm.addEventListener("submit", async event => {
+    event.preventDefault();
+
+    const message = document.getElementById("galleryMessage");
+    const title = document.getElementById("galleryTitle").value.trim();
+    const description = document.getElementById("galleryDescription").value.trim();
+    const file = document.getElementById("galleryFile").files[0];
+
+    if (!title || !file) {
+      showMessage("galleryMessage", "Please enter a title and select a photo.", "error");
+      return;
+    }
+
+    if (!file.type.startsWith("image/")) {
+      showMessage("galleryMessage", "Please select an image file.", "error");
+      return;
+    }
+
+    const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, "_");
+    const path = `${Date.now()}_${safeName}`;
+
+    const { data: uploaded, error: uploadError } = await db.storage
+      .from("gallery")
+      .upload(path, file, { upsert: false });
+
+    if (uploadError) {
+      showMessage("galleryMessage", uploadError.message, "error");
+      return;
+    }
+
+    const { data: publicData } = db.storage
+      .from("gallery")
+      .getPublicUrl(uploaded.path);
+
+    const { error: insertError } = await db
+      .from("gallery")
+      .insert({
+        title,
+        description,
+        image_url: publicData.publicUrl,
+        storage_path: uploaded.path
+      });
+
+    if (insertError) {
+      showMessage(
+        "galleryMessage",
+        "Photo uploaded, but saving its details failed: " + insertError.message,
+        "error"
+      );
+      return;
+    }
+
+    galleryForm.reset();
+    showMessage("galleryMessage", "Photo uploaded successfully!", "success");
+    await loadGallery();
+  });
+}
 
 \</script>
 
