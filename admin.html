@@ -799,6 +799,61 @@
     \</div>
 
   \</section>
+  
+<section id="gallerySection" class="section">
+
+  <div class="card">
+    <h2>Upload Gallery Photo</h2>
+
+    <form id="galleryForm">
+      <div class="form-grid">
+
+        <div>
+          <label>Photo Title *</label>
+          <input
+            type="text"
+            id="galleryTitle"
+            required
+            placeholder="Enter photo title"
+          >
+        </div>
+
+        <div>
+          <label>Select Photo *</label>
+          <input
+            type="file"
+            id="galleryFile"
+            accept="image/*"
+            required
+          >
+        </div>
+
+        <div class="full">
+          <label>Description</label>
+          <textarea
+            id="galleryDescription"
+            placeholder="Write a short description"
+          ></textarea>
+        </div>
+
+      </div>
+
+      <div class="form-actions">
+        <button type="submit">Upload Photo</button>
+      </div>
+
+      <div id="galleryMessage" class="message"></div>
+    </form>
+  </div>
+
+  <div class="card">
+    <h2>Gallery Library</h2>
+    <div id="galleryList">
+      Photos will appear here after loading.
+    </div>
+  </div>
+
+</section>
 
 \</div>
 
