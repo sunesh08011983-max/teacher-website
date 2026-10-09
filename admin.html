@@ -329,15 +329,13 @@
   \</div>
 
   \<!-- TABS -->
- 
-<!-- TABS -->
-<div class="tabs">
-  <button class="tab active" data-tab="studentsSection">Students</button>
-  <button class="tab" data-tab="feesSection">Fees</button>
-  <button class="tab" data-tab="receiptsSection">Receipts</button>
-  <button class="tab" data-tab="lecturesSection">Lectures</button>
-  <button class="tab" data-tab="gallerySection">Gallery</button>
-</div>
+  \<div class="tabs">
+    \<button class="tab active" data-tab="studentsSection">Students\</button>
+    \<button class="tab" data-tab="feesSection">Fees\</button>
+    \<button class="tab" data-tab="receiptsSection">Receipts\</button>
+    \<button class="tab" data-tab="lecturesSection">Lectures\</button>
+  \</div>
+
 
 
   \<!-- ================= STUDENTS ================= -->
@@ -799,61 +797,6 @@
     \</div>
 
   \</section>
-  
-<section id="gallerySection" class="section">
-
-  <div class="card">
-    <h2>Upload Gallery Photo</h2>
-
-    <form id="galleryForm">
-      <div class="form-grid">
-
-        <div>
-          <label>Photo Title *</label>
-          <input
-            type="text"
-            id="galleryTitle"
-            required
-            placeholder="Enter photo title"
-          >
-        </div>
-
-        <div>
-          <label>Select Photo *</label>
-          <input
-            type="file"
-            id="galleryFile"
-            accept="image/*"
-            required
-          >
-        </div>
-
-        <div class="full">
-          <label>Description</label>
-          <textarea
-            id="galleryDescription"
-            placeholder="Write a short description"
-          ></textarea>
-        </div>
-
-      </div>
-
-      <div class="form-actions">
-        <button type="submit">Upload Photo</button>
-      </div>
-
-      <div id="galleryMessage" class="message"></div>
-    </form>
-  </div>
-
-  <div class="card">
-    <h2>Gallery Library</h2>
-    <div id="galleryList">
-      Photos will appear here after loading.
-    </div>
-  </div>
-
-</section>
 
 \</div>
 
@@ -2330,104 +2273,6 @@
 
 
   initialize();
-  
-async function loadGallery() {
-  const list = document.getElementById("galleryList");
-
-  if (!list) return;
-
-  list.textContent = "Loading photos...";
-
-  const { data, error } = await db
-    .from("gallery")
-    .select("*")
-    .order("created_at", { ascending: false });
-
-  if (error) {
-    console.error("Gallery:", error);
-    list.textContent = "Could not load gallery: " + error.message;
-    return;
-  }
-
-  if (!data || data.length === 0) {
-    list.textContent = "No photos uploaded yet.";
-    return;
-  }
-
-  list.innerHTML = data.map(photo => `
-    <div style="display:inline-block;vertical-align:top;width:220px;margin:10px;padding:10px;border:1px solid #ddd;border-radius:8px;">
-      <img
-        src="${escapeHtml(photo.image_url)}"
-        alt="${escapeHtml(photo.title)}"
-        style="width:100%;height:150px;object-fit:cover;border-radius:6px;"
-      >
-      <h3>${escapeHtml(photo.title)}</h3>
-      <p>${escapeHtml(photo.description || "")}</p>
-    </div>
-  `).join("");
-}
-
-
-const galleryForm = document.getElementById("galleryForm");
-
-if (galleryForm) {
-  galleryForm.addEventListener("submit", async event => {
-    event.preventDefault();
-
-    const message = document.getElementById("galleryMessage");
-    const title = document.getElementById("galleryTitle").value.trim();
-    const description = document.getElementById("galleryDescription").value.trim();
-    const file = document.getElementById("galleryFile").files[0];
-
-    if (!title || !file) {
-      showMessage("galleryMessage", "Please enter a title and select a photo.", "error");
-      return;
-    }
-
-    if (!file.type.startsWith("image/")) {
-      showMessage("galleryMessage", "Please select an image file.", "error");
-      return;
-    }
-
-    const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, "_");
-    const path = `${Date.now()}_${safeName}`;
-
-    const { data: uploaded, error: uploadError } = await db.storage
-      .from("gallery")
-      .upload(path, file, { upsert: false });
-
-    if (uploadError) {
-      showMessage("galleryMessage", uploadError.message, "error");
-      return;
-    }
-
-    const { data: publicData } = db.storage
-      .from("gallery")
-      .getPublicUrl(uploaded.path);
-
-    const { error: insertError } = await db
-      .from("gallery")
-      .insert({
-        title,
-        description,
-        image_url: publicData.publicUrl,
-        storage_path: uploaded.path
-      });
-
-    if (insertError) {
-      showMessage(
-        "galleryMessage",
-        "Photo uploaded, but saving its details failed: " + insertError.message,
-        "error"
-      );
-      return;
-    }
-
-    galleryForm.reset();
-    showMessage("galleryMessage", "Photo uploaded successfully!", "success");
-    await loadGallery();
-  });
-}
 
 \</script>
 
